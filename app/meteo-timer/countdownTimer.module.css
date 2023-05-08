@@ -1,0 +1,47 @@
+.countdown_timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.timer_text {
+    font-size: 5rem;
+    margin-bottom: 2rem;
+}
+
+.button_container {
+    display: flex;
+}
+
+.start_stop_button {
+    font-size: 2rem;
+    padding: 1rem;
+    margin-right: 2rem;
+    background-color: #0077CC;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.start_stop_button:hover {
+    background-color: #005EA8;
+}
+
+.reset_button {
+    font-size: 2rem;
+    padding: 1rem;
+    background-color: #CC0000;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.reset_button:hover {
+    background-color: #A80000;
+}
