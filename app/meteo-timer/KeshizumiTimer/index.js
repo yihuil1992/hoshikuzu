@@ -1,5 +1,10 @@
 import {useEffect, useState} from 'react';
-import {Box, Button, CircularProgress, CircularProgressLabel, Flex, Heading} from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  CircularProgressLabel,
+  Heading} from '@chakra-ui/react';
 
 const KeshizumiTimer = () => {
   const [seconds, setSeconds] = useState(29);

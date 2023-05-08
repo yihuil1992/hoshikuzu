@@ -1,5 +1,10 @@
 import {useEffect, useState} from 'react';
-import {Box, Button, CircularProgress, CircularProgressLabel, Heading} from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  CircularProgressLabel,
+  Heading} from '@chakra-ui/react';
 
 const OneMinTimer = () => {
   const [seconds, setSeconds] = useState(60);
