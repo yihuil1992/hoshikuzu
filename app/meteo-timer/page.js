@@ -5,9 +5,7 @@ import {VStack} from '@chakra-ui/react';
 
 const MeteoTimerPage = () => {
   return (
-    <VStack
-      height={'100vh'}
-      justifyContent={'space-around'}>
+    <VStack>
       <KeshizumiTimer />
       <OneMinTimer />
     </VStack>
