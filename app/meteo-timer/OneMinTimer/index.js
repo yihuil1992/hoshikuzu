@@ -4,9 +4,9 @@ import {
   Button,
   CircularProgress,
   CircularProgressLabel,
-  Heading,
+  Heading, HStack,
   IconButton,
-  useColorMode,
+  useColorMode, VStack,
 } from '@chakra-ui/react';
 import {FaVolumeUp, FaVolumeMute} from 'react-icons/fa';
 import useSound from 'use-sound';
@@ -57,17 +57,15 @@ const OneMinTimer = () => {
   };
 
   return (
-    <Box
+    <VStack
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
       position={'relative'}
     >
-      <Box
-        position={'absolute'}
-        right={0}
-        top={0}>
+      <HStack>
+        <Heading>範囲技</Heading>
         <IconButton
           onClick={toggleSound}
           aria-label="Toggle sound"
@@ -77,8 +75,7 @@ const OneMinTimer = () => {
           marginRight={2}
           colorScheme={colorMode === 'dark' ? 'white' : 'blackAlpha'}
         />
-      </Box>
-      <Heading>範囲技</Heading>
+      </HStack>
       <Box
         display="flex"
         alignItems="center"
@@ -116,7 +113,7 @@ const OneMinTimer = () => {
             Reset
         </Button>
       </Box>
-    </Box>
+    </VStack>
   );
 };
 

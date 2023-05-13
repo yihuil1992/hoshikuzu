@@ -4,8 +4,8 @@ import {
   Button,
   CircularProgress,
   CircularProgressLabel,
-  Heading, IconButton,
-  useColorMode,
+  Heading, HStack, IconButton,
+  useColorMode, VStack,
 } from '@chakra-ui/react';
 import useSound from 'use-sound';
 import {FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
@@ -61,17 +61,15 @@ const KeshizumiTimer = () => {
   };
 
   return (
-    <Box
+    <VStack
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
       position={'relative'}
     >
-      <Box
-        position={'absolute'}
-        right={0}
-        top={0}>
+      <HStack>
+        <Heading>消し炭</Heading>
         <IconButton
           onClick={toggleSound}
           aria-label="Toggle sound"
@@ -81,8 +79,7 @@ const KeshizumiTimer = () => {
           marginRight={2}
           colorScheme={colorMode === 'dark' ? 'white' : 'blackAlpha'}
         />
-      </Box>
-      <Heading>消し炭</Heading>
+      </HStack>
       <Box
         display="flex"
         alignItems="center"
@@ -121,7 +118,7 @@ const KeshizumiTimer = () => {
             Reset
         </Button>
       </Box>
-    </Box>
+    </VStack>
   );
 };
 
