@@ -4,35 +4,44 @@ import {
   Button,
   CircularProgress,
   CircularProgressLabel,
-  Heading} from '@chakra-ui/react';
+  Heading,
+  IconButton,
+  useColorMode,
+} from '@chakra-ui/react';
+import {FaVolumeUp, FaVolumeMute} from 'react-icons/fa';
 import useSound from 'use-sound';
 
 const OneMinTimer = () => {
-  const [seconds, setSeconds] = useState(60);
+  const [seconds, setSeconds] = useState(59);
   const [isRunning, setIsRunning] = useState(false);
+  const [playSound, setPlaySound] = useState(true);
   const [beepPlay] = useSound('/assets/sounds/LAPUTA_counter_2.mp3');
   const [beepFinishPlay] = useSound('/assets/sounds/LAPUTA_counter_3.mp3');
+  const {colorMode} = useColorMode();
 
   useEffect(() => {
     let interval = null;
-    if (isRunning && seconds === 0) {
-      setSeconds(59);
-    } else if (isRunning) {
+    if (isRunning) {
       interval = setInterval(() => {
-        setSeconds(seconds - 1);
+        if (seconds === 0) {
+          setSeconds(59);
+        } else {
+          setSeconds(seconds - 1);
+        }
       }, 1000);
     }
+
     return () => clearInterval(interval);
   }, [seconds, isRunning]);
 
   useEffect(() => {
-    if (seconds > 0 && seconds < 5) {
+    if (playSound && seconds > 0 && seconds < 5) {
       beepPlay();
     }
-    if (seconds === 0) {
+    if (playSound && seconds === 0) {
       beepFinishPlay();
     }
-  }, [seconds]);
+  }, [seconds, playSound]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
@@ -43,13 +52,32 @@ const OneMinTimer = () => {
     setIsRunning(true);
   };
 
+  const toggleSound = () => {
+    setPlaySound(!playSound);
+  };
+
   return (
     <Box
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
+      position={'relative'}
     >
+      <Box
+        position={'absolute'}
+        right={0}
+        top={0}>
+        <IconButton
+          onClick={toggleSound}
+          aria-label="Toggle sound"
+          icon={playSound ? <FaVolumeUp /> : <FaVolumeMute />}
+          size="lg"
+          variant="ghost"
+          marginRight={2}
+          colorScheme={colorMode === 'dark' ? 'white' : 'blackAlpha'}
+        />
+      </Box>
       <Heading>範囲技</Heading>
       <Box
         display="flex"
@@ -65,16 +93,14 @@ const OneMinTimer = () => {
               <CircularProgress
                 value={seconds}
                 size="full"
-                thickness="8px"
-                color="white"
-              >
+                thickness="8px">
                 <CircularProgressLabel
-                  fontSize={'lg'}>{seconds}</CircularProgressLabel>
+                  fontSize="lg">
+                  {seconds}
+                </CircularProgressLabel>
               </CircularProgress>
           ) : (
-              <Heading size="md" >
-                {seconds}
-              </Heading>
+              <Heading size="md">{seconds}</Heading>
           )}
       </Box>
       <Box display="flex" alignItems="center" justifyContent="center">

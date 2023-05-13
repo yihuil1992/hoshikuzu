@@ -4,12 +4,20 @@ import {
   Button,
   CircularProgress,
   CircularProgressLabel,
-  Heading} from '@chakra-ui/react';
+  Heading, IconButton,
+  useColorMode,
+} from '@chakra-ui/react';
+import useSound from 'use-sound';
+import {FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
 
 const KeshizumiTimer = () => {
   const [seconds, setSeconds] = useState(29);
   const [isThirty, setIsThirty] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
+  const [playSound, setPlaySound] = useState(true);
+  const [beepPlay] = useSound('/assets/sounds/LAPUTA_counter_2.mp3');
+  const [beepFinishPlay] = useSound('/assets/sounds/LAPUTA_counter_3.mp3');
+  const {colorMode} = useColorMode();
 
   useEffect(() => {
     let interval = null;
@@ -29,6 +37,15 @@ const KeshizumiTimer = () => {
     return () => clearInterval(interval);
   }, [seconds, isThirty, isRunning]);
 
+  useEffect(() => {
+    if (playSound && seconds > 0 && seconds < 5) {
+      beepPlay();
+    }
+    if (playSound && seconds === 0) {
+      beepFinishPlay();
+    }
+  }, [seconds, playSound]);
+
   const handleStartStop = () => {
     setIsRunning(!isRunning);
   };
@@ -39,14 +56,32 @@ const KeshizumiTimer = () => {
     setIsRunning(true);
   };
 
+  const toggleSound = () => {
+    setPlaySound(!playSound);
+  };
+
   return (
     <Box
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      backgroundColor="gray.50"
+      position={'relative'}
     >
+      <Box
+        position={'absolute'}
+        right={0}
+        top={0}>
+        <IconButton
+          onClick={toggleSound}
+          aria-label="Toggle sound"
+          icon={playSound ? <FaVolumeUp /> : <FaVolumeMute />}
+          size="lg"
+          variant="ghost"
+          marginRight={2}
+          colorScheme={colorMode === 'dark' ? 'white' : 'blackAlpha'}
+        />
+      </Box>
       <Heading>消し炭</Heading>
       <Box
         display="flex"
@@ -63,7 +98,6 @@ const KeshizumiTimer = () => {
                 value={seconds}
                 size="full"
                 thickness="8px"
-                color="white"
               >
                 <CircularProgressLabel
                   fontSize={'lg'}>{seconds}</CircularProgressLabel>
