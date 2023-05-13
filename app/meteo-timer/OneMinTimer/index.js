@@ -5,10 +5,13 @@ import {
   CircularProgress,
   CircularProgressLabel,
   Heading} from '@chakra-ui/react';
+import useSound from 'use-sound';
 
 const OneMinTimer = () => {
   const [seconds, setSeconds] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
+  const [beepPlay] = useSound('/assets/sounds/LAPUTA_counter_2.mp3');
+  const [beepFinishPlay] = useSound('/assets/sounds/LAPUTA_counter_3.mp3');
 
   useEffect(() => {
     let interval = null;
@@ -21,6 +24,15 @@ const OneMinTimer = () => {
     }
     return () => clearInterval(interval);
   }, [seconds, isRunning]);
+
+  useEffect(() => {
+    if (seconds > 0 && seconds < 5) {
+      beepPlay();
+    }
+    if (seconds === 0) {
+      beepFinishPlay();
+    }
+  }, [seconds]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
@@ -37,7 +49,6 @@ const OneMinTimer = () => {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      backgroundColor="gray.50"
     >
       <Heading>範囲技</Heading>
       <Box
@@ -61,7 +72,7 @@ const OneMinTimer = () => {
                   fontSize={'lg'}>{seconds}</CircularProgressLabel>
               </CircularProgress>
           ) : (
-              <Heading size="md" color="white">
+              <Heading size="md" >
                 {seconds}
               </Heading>
           )}
