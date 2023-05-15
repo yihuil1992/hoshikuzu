@@ -8,7 +8,7 @@ import {
   useColorMode, VStack,
 } from '@chakra-ui/react';
 import useSound from 'use-sound';
-import {FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
+import {FaMinus, FaPlus, FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
 
 const KeshizumiTimer = () => {
   const [seconds, setSeconds] = useState(29);
@@ -60,6 +60,14 @@ const KeshizumiTimer = () => {
     setPlaySound(!playSound);
   };
 
+  const handlePlusSeconds = () => {
+    setSeconds(seconds + 1);
+  };
+
+  const handleMinusSeconds = () => {
+    setSeconds(seconds - 1);
+  };
+
   return (
     <VStack
       display="flex"
@@ -80,31 +88,40 @@ const KeshizumiTimer = () => {
           colorScheme={colorMode === 'dark' ? 'white' : 'blackAlpha'}
         />
       </HStack>
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        borderRadius="full"
-        backgroundColor={isRunning ? 'green.500' : 'gray.500'}
-        width={24}
-        height={24}
-        marginBottom={4}
-      >
-        {isRunning ? (
+      <HStack>
+        <IconButton
+          aria-label={'Minus'}
+          icon={<FaMinus />}
+          onClick={handleMinusSeconds} />
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          borderRadius="full"
+          backgroundColor={isRunning ? 'green.500' : 'gray.500'}
+          width={24}
+          height={24}
+          marginBottom={4}
+        >
+          {isRunning ? (
               <CircularProgress
                 value={seconds}
                 size="full"
-                thickness="8px"
-              >
+                thickness="8px">
                 <CircularProgressLabel
-                  fontSize={'lg'}>{seconds}</CircularProgressLabel>
+                  fontSize="lg">
+                  {seconds}
+                </CircularProgressLabel>
               </CircularProgress>
           ) : (
-              <Heading size="md" color="white">
-                {seconds}
-              </Heading>
+              <Heading size="md">{seconds}</Heading>
           )}
-      </Box>
+        </Box>
+        <IconButton
+          aria-label={'Plus'}
+          icon={<FaPlus />}
+          onClick={handlePlusSeconds} />
+      </HStack>
       <Box display="flex" alignItems="center" justifyContent="center">
         <Button
           onClick={handleStartStop}
