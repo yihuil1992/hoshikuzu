@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {
   Box,
   Button,
@@ -23,28 +23,30 @@ const KeshizumiTimer = () => {
     let interval = null;
     if (isRunning) {
       interval = setInterval(() => {
-        if (isThirty && seconds === 0) {
-          setSeconds(32);
-          setIsThirty(false);
-        } else if (!isThirty && seconds === 0) {
-          setSeconds(29);
-          setIsThirty(true);
-        } else {
-          setSeconds(seconds - 1);
-        }
+        setSeconds((prevSeconds) => {
+          if (prevSeconds === 0) {
+            setIsThirty(!isThirty);
+            return isThirty ? 32 : 29;
+          }
+          return prevSeconds - 1;
+        });
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [seconds, isThirty, isRunning]);
+  }, [isRunning, isThirty]);
 
-  useEffect(() => {
+  const playBeep = useCallback(() => {
     if (playSound && seconds > 0 && seconds < 5) {
       beepPlay();
     }
     if (playSound && seconds === 0) {
       beepFinishPlay();
     }
-  }, [seconds, playSound]);
+  }, [playSound, seconds, beepPlay, beepFinishPlay]);
+
+  useEffect(() => {
+    playBeep();
+  }, [playBeep]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
@@ -60,12 +62,8 @@ const KeshizumiTimer = () => {
     setPlaySound(!playSound);
   };
 
-  const handlePlusSeconds = () => {
-    setSeconds(seconds + 1);
-  };
-
-  const handleMinusSeconds = () => {
-    setSeconds(seconds - 1);
+  const handleSeconds = (increment) => {
+    setSeconds((prevSeconds) => prevSeconds + increment);
   };
 
   return (
@@ -92,7 +90,7 @@ const KeshizumiTimer = () => {
         <IconButton
           aria-label={'Minus'}
           icon={<FaMinus />}
-          onClick={handleMinusSeconds} />
+          onClick={handleSeconds.bind(null, -1)} />
         <Box
           display="flex"
           alignItems="center"
@@ -120,7 +118,7 @@ const KeshizumiTimer = () => {
         <IconButton
           aria-label={'Plus'}
           icon={<FaPlus />}
-          onClick={handlePlusSeconds} />
+          onClick={handleSeconds.bind(null, 1)} />
       </HStack>
       <Box display="flex" alignItems="center" justifyContent="center">
         <Button

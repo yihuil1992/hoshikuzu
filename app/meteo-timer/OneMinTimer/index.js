@@ -1,12 +1,14 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {
   Box,
   Button,
   CircularProgress,
   CircularProgressLabel,
-  Heading, HStack,
+  Heading,
+  HStack,
   IconButton,
-  useColorMode, VStack,
+  useColorMode,
+  VStack,
 } from '@chakra-ui/react';
 import {FaVolumeUp, FaVolumeMute, FaMinus, FaPlus} from 'react-icons/fa';
 import useSound from 'use-sound';
@@ -23,25 +25,31 @@ const OneMinTimer = () => {
     let interval = null;
     if (isRunning) {
       interval = setInterval(() => {
-        if (seconds === 0) {
-          setSeconds(59);
-        } else {
-          setSeconds(seconds - 1);
-        }
+        setSeconds((prevSeconds) => {
+          if (prevSeconds === 0) {
+            return 59;
+          }
+          return prevSeconds - 1;
+        });
       }, 1000);
     }
 
     return () => clearInterval(interval);
-  }, [seconds, isRunning]);
+  }, [isRunning]);
 
-  useEffect(() => {
+  const playBeep = useCallback(() => {
     if (playSound && seconds > 0 && seconds < 5) {
       beepPlay();
     }
     if (playSound && seconds === 0) {
       beepFinishPlay();
     }
-  }, [seconds, playSound]);
+  }, [playSound, seconds, beepPlay, beepFinishPlay]);
+
+  useEffect(() => {
+    playBeep();
+  }, [playBeep]);
+
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
@@ -56,12 +64,8 @@ const OneMinTimer = () => {
     setPlaySound(!playSound);
   };
 
-  const handlePlusSeconds = () => {
-    setSeconds(seconds + 1);
-  };
-
-  const handleMinusSeconds = () => {
-    setSeconds(seconds - 1);
+  const handleSeconds = (increment) => {
+    setSeconds((prevSeconds) => prevSeconds + increment);
   };
 
   return (
@@ -88,7 +92,7 @@ const OneMinTimer = () => {
         <IconButton
           aria-label={'Minus'}
           icon={<FaMinus />}
-          onClick={handleMinusSeconds} />
+          onClick={handleSeconds.bind(0, -1)} />
         <Box
           display="flex"
           alignItems="center"
@@ -116,7 +120,7 @@ const OneMinTimer = () => {
         <IconButton
           aria-label={'Plus'}
           icon={<FaPlus />}
-          onClick={handlePlusSeconds} />
+          onClick={handleSeconds.bind(0, 1)} />
       </HStack>
       <Box display="flex" alignItems="center" justifyContent="center">
         <Button
