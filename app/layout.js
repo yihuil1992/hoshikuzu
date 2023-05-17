@@ -1,5 +1,6 @@
 import './globals.css';
 import Providers from '@/app/providers';
+import {Analytics} from '@vercel/analytics/react';
 
 export const metadata = {
   title: 'ほしくず',
@@ -13,6 +14,7 @@ export default function RootLayout({children}) {
       <body>
         <Providers>
           {children}
+          <Analytics />
         </Providers>
       </body>
     </html>
