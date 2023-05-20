@@ -10,8 +10,8 @@ import {
 import useSound from 'use-sound';
 import {FaMinus, FaPlus, FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
 
-const KeshizumiTimer = () => {
-  const [seconds, setSeconds] = useState(29);
+const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
+  const [seconds, setSeconds] = useState(30);
   const [isThirty, setIsThirty] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [playSound, setPlaySound] = useState(true);
@@ -26,7 +26,7 @@ const KeshizumiTimer = () => {
         setSeconds((prevSeconds) => {
           if (prevSeconds === 0) {
             setIsThirty(!isThirty);
-            return isThirty ? 32 : 29;
+            return isThirty ? 32 : 30;
           }
           return prevSeconds - 1;
         });
@@ -34,6 +34,13 @@ const KeshizumiTimer = () => {
     }
     return () => clearInterval(interval);
   }, [isRunning, isThirty]);
+
+  useEffect(() => {
+    if (isGlobalRunning) {
+      handleReset();
+      setIsGlobalRunning(false);
+    }
+  }, [isGlobalRunning]);
 
   const playBeep = useCallback(() => {
     if (playSound && seconds > 0 && seconds < 5) {
@@ -53,7 +60,7 @@ const KeshizumiTimer = () => {
   };
 
   const handleReset = () => {
-    setSeconds(29);
+    setSeconds(30);
     setIsThirty(true);
     setIsRunning(true);
   };

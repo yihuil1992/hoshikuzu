@@ -13,8 +13,8 @@ import {
 import {FaVolumeUp, FaVolumeMute, FaMinus, FaPlus} from 'react-icons/fa';
 import useSound from 'use-sound';
 
-const OneMinTimer = () => {
-  const [seconds, setSeconds] = useState(59);
+const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
+  const [seconds, setSeconds] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
   const [playSound, setPlaySound] = useState(true);
   const [beepPlay] = useSound('/assets/sounds/LAPUTA_counter_2.mp3');
@@ -27,7 +27,7 @@ const OneMinTimer = () => {
       interval = setInterval(() => {
         setSeconds((prevSeconds) => {
           if (prevSeconds === 0) {
-            return 59;
+            return 60;
           }
           return prevSeconds - 1;
         });
@@ -36,6 +36,13 @@ const OneMinTimer = () => {
 
     return () => clearInterval(interval);
   }, [isRunning]);
+
+  useEffect(() => {
+    if (isGlobalRunning) {
+      handleReset();
+      setIsGlobalRunning(false);
+    }
+  }, [isGlobalRunning]);
 
   const playBeep = useCallback(() => {
     if (playSound && seconds > 0 && seconds < 5) {
@@ -56,7 +63,7 @@ const OneMinTimer = () => {
   };
 
   const handleReset = () => {
-    setSeconds(59);
+    setSeconds(60);
     setIsRunning(true);
   };
 
