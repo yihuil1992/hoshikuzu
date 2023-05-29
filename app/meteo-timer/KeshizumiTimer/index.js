@@ -4,11 +4,17 @@ import {
   Button,
   CircularProgress,
   CircularProgressLabel,
-  Heading, HStack, IconButton,
-  useColorMode, VStack,
+  Heading,
+  HStack,
+  IconButton,
+  Switch,
+  Text,
+  useColorMode,
+  VStack,
 } from '@chakra-ui/react';
 import useSound from 'use-sound';
 import {FaMinus, FaPlus, FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
+import s from './Keshizumi.module.css';
 
 const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [seconds, setSeconds] = useState(30);
@@ -73,6 +79,10 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
     setSeconds((prevSeconds) => prevSeconds + increment);
   };
 
+  const handleThirty = () => {
+    setIsThirty(!isThirty);
+  };
+
   return (
     <VStack
       display="flex"
@@ -92,6 +102,20 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
           marginRight={2}
           colorScheme={colorMode === 'dark' ? 'white' : 'blackAlpha'}
         />
+      </HStack>
+      <HStack>
+        <Text>今は</Text>
+        <Text
+          className={isThirty ? s.active_text : s.idle_text}>
+          30秒</Text>
+        <Switch
+          size={`lg`}
+          isChecked={!isThirty}
+          onChange={handleThirty}/>
+        <Text
+          className={isThirty ? s.idle_text : s.active_text}>
+          32秒</Text>
+        <Text>から</Text>
       </HStack>
       <HStack>
         <IconButton
