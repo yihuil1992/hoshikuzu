@@ -9,21 +9,25 @@ import {
   IconButton,
   Switch,
   Text,
-  useColorMode,
   VStack,
 } from '@chakra-ui/react';
 import useSound from 'use-sound';
-import {FaMinus, FaPlus, FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
+import {FaMinus, FaPlus} from 'react-icons/fa';
 import s from './Keshizumi.module.css';
+import {counterEffects} from '@/constants/soundEffects';
+import SoundSelector from '@/components/SoundSelector';
 
 const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [seconds, setSeconds] = useState(30);
   const [isThirty, setIsThirty] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [playSound, setPlaySound] = useState(true);
-  const [beepPlay] = useSound('/assets/sounds/LAPUTA_counter_2.mp3');
-  const [beepFinishPlay] = useSound('/assets/sounds/LAPUTA_counter_3.mp3');
-  const {colorMode} = useColorMode();
+  const [sounds, setSounds] = useState({
+    counterSoundPath: counterEffects[0].counterSoundPath,
+    finishSoundPath: counterEffects[0].finishSoundPath,
+  });
+  const [beepPlay] = useSound(sounds.counterSoundPath);
+  const [beepFinishPlay] = useSound(sounds.finishSoundPath);
 
   useEffect(() => {
     let interval = null;
@@ -71,10 +75,6 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
     setIsRunning(true);
   };
 
-  const toggleSound = () => {
-    setPlaySound(!playSound);
-  };
-
   const handleSeconds = (increment) => {
     setSeconds((prevSeconds) => prevSeconds + increment);
   };
@@ -93,15 +93,11 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
     >
       <HStack>
         <Heading>消し炭</Heading>
-        <IconButton
-          onClick={toggleSound}
-          aria-label="Toggle sound"
-          icon={playSound ? <FaVolumeUp /> : <FaVolumeMute />}
-          size="lg"
-          variant="ghost"
-          marginRight={2}
-          colorScheme={colorMode === 'dark' ? 'white' : 'blackAlpha'}
-        />
+        <SoundSelector
+          sounds={sounds}
+          setSounds={setSounds}
+          playSound={playSound}
+          setPlaySound={setPlaySound} />
       </HStack>
       <HStack>
         <Text>今は</Text>
