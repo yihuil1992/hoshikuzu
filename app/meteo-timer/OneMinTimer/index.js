@@ -17,14 +17,10 @@ import SoundSelector from '@/components/SoundSelector';
 const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [seconds, setSeconds] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
-  const [playSound, setPlaySound] = useState(
-      localStorage.getItem('blazePlaySound') === null ?
-      true :
-        localStorage.getItem('blazePlaySound') === 'true');
-  const soundIdx = localStorage.getItem('blazeSoundIdx') || 1;
+  const [playSound, setPlaySound] = useState(true);
   const [sounds, setSounds] = useState({
-    counterSoundPath: counterEffects[soundIdx].counterSoundPath,
-    finishSoundPath: counterEffects[soundIdx].finishSoundPath,
+    counterSoundPath: counterEffects[0].counterSoundPath,
+    finishSoundPath: counterEffects[0].finishSoundPath,
   });
   const [beepPlay] = useSound(sounds.counterSoundPath);
   const [beepFinishPlay] = useSound(sounds.finishSoundPath);
@@ -64,6 +60,18 @@ const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
       setIsGlobalRunning(false);
     }
   }, [isGlobalRunning]);
+
+  useEffect(() => {
+    const soundIdx = localStorage.getItem('blazeSoundIdx') || 1;
+    const isSoundPlaying = localStorage.getItem('blazePlaySound');
+    setSounds({
+      counterSoundPath: counterEffects[soundIdx].counterSoundPath,
+      finishSoundPath: counterEffects[soundIdx].finishSoundPath,
+    });
+    if (isSoundPlaying) {
+      setPlaySound(isSoundPlaying === 'true');
+    }
+  }, []);
 
   const playBeep = useCallback(() => {
     if (playSound && seconds > 0 && seconds < 5) {

@@ -21,14 +21,10 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [seconds, setSeconds] = useState(30);
   const [isThirty, setIsThirty] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
-  const [playSound, setPlaySound] = useState(
-      localStorage.getItem('keshizumiPlaySound') === null ?
-      true :
-    localStorage.getItem('keshizumiPlaySound') === 'true');
-  const soundIdx = localStorage.getItem('keshizumiSoundIdx') || 0;
+  const [playSound, setPlaySound] = useState(true);
   const [sounds, setSounds] = useState({
-    counterSoundPath: counterEffects[soundIdx].counterSoundPath,
-    finishSoundPath: counterEffects[soundIdx].finishSoundPath,
+    counterSoundPath: counterEffects[0].counterSoundPath,
+    finishSoundPath: counterEffects[0].finishSoundPath,
   });
   const [beepPlay] = useSound(sounds.counterSoundPath);
   const [beepFinishPlay] = useSound(sounds.finishSoundPath);
@@ -68,6 +64,18 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
       setIsGlobalRunning(false);
     }
   }, [isGlobalRunning]);
+
+  useEffect(() => {
+    const soundIdx = localStorage.getItem('keshizumiSoundIdx') || 0;
+    const isSoundPlaying = localStorage.getItem('keshizumiPlaySound');
+    setSounds({
+      counterSoundPath: counterEffects[soundIdx].counterSoundPath,
+      finishSoundPath: counterEffects[soundIdx].finishSoundPath,
+    });
+    if (isSoundPlaying) {
+      setPlaySound(isSoundPlaying === 'true');
+    }
+  }, []);
 
   const playBeep = useCallback(() => {
     if (playSound && seconds > 0 && seconds < 5) {
