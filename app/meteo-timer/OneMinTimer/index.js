@@ -17,13 +17,30 @@ import SoundSelector from '@/components/SoundSelector';
 const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [seconds, setSeconds] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
-  const [playSound, setPlaySound] = useState(true);
+  const [playSound, setPlaySound] = useState(
+      localStorage.getItem('blazePlaySound') === null ?
+      true :
+        localStorage.getItem('blazePlaySound') === 'true');
+  const soundIdx = localStorage.getItem('blazeSoundIdx') || 1;
   const [sounds, setSounds] = useState({
-    counterSoundPath: counterEffects[1].counterSoundPath,
-    finishSoundPath: counterEffects[1].finishSoundPath,
+    counterSoundPath: counterEffects[soundIdx].counterSoundPath,
+    finishSoundPath: counterEffects[soundIdx].finishSoundPath,
   });
   const [beepPlay] = useSound(sounds.counterSoundPath);
   const [beepFinishPlay] = useSound(sounds.finishSoundPath);
+
+  const changeSounds = (newSounds) => {
+    const newSoundIdx = counterEffects.findIndex((effect) => {
+      return effect.counterSoundPath === newSounds.counterSoundPath;
+    }) || 0;
+    localStorage.setItem('blazeSoundIdx', newSoundIdx);
+    setSounds(newSounds);
+  };
+
+  const changePlaySound = (newPlaySound) => {
+    localStorage.setItem('blazePlaySound', newPlaySound);
+    setPlaySound(newPlaySound);
+  };
 
   useEffect(() => {
     let interval = null;
@@ -87,9 +104,9 @@ const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
         <Heading>範囲技</Heading>
         <SoundSelector
           sounds={sounds}
-          setSounds={setSounds}
+          setSounds={changeSounds}
           playSound={playSound}
-          setPlaySound={setPlaySound} />
+          setPlaySound={changePlaySound} />
       </HStack>
       <HStack>
         <IconButton

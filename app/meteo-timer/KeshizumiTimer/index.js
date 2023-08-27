@@ -21,13 +21,30 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [seconds, setSeconds] = useState(30);
   const [isThirty, setIsThirty] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
-  const [playSound, setPlaySound] = useState(true);
+  const [playSound, setPlaySound] = useState(
+      localStorage.getItem('keshizumiPlaySound') === null ?
+      true :
+    localStorage.getItem('keshizumiPlaySound') === 'true');
+  const soundIdx = localStorage.getItem('keshizumiSoundIdx') || 0;
   const [sounds, setSounds] = useState({
-    counterSoundPath: counterEffects[0].counterSoundPath,
-    finishSoundPath: counterEffects[0].finishSoundPath,
+    counterSoundPath: counterEffects[soundIdx].counterSoundPath,
+    finishSoundPath: counterEffects[soundIdx].finishSoundPath,
   });
   const [beepPlay] = useSound(sounds.counterSoundPath);
   const [beepFinishPlay] = useSound(sounds.finishSoundPath);
+
+  const changeSounds = (newSounds) => {
+    const newSoundIdx = counterEffects.findIndex((effect) => {
+      return effect.counterSoundPath === newSounds.counterSoundPath;
+    }) || 0;
+    localStorage.setItem('keshizumiSoundIdx', newSoundIdx);
+    setSounds(newSounds);
+  };
+
+  const changePlaySound = (newPlaySound) => {
+    localStorage.setItem('keshizumiPlaySound', newPlaySound);
+    setPlaySound(newPlaySound);
+  };
 
   useEffect(() => {
     let interval = null;
@@ -95,9 +112,9 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
         <Heading>消し炭</Heading>
         <SoundSelector
           sounds={sounds}
-          setSounds={setSounds}
+          setSounds={changeSounds}
           playSound={playSound}
-          setPlaySound={setPlaySound} />
+          setPlaySound={changePlaySound} />
       </HStack>
       <HStack>
         <Text>今は</Text>
