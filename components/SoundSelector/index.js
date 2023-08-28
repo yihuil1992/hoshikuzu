@@ -13,10 +13,7 @@ const SoundSelector = ( {sounds, setSounds, playSound, setPlaySound} ) => {
           aria-label={counterEffect.name}
           leftIcon={<FaVolumeUp />}
           onClick={() => {
-            setSounds({
-              counterSoundPath: counterEffect.counterSoundPath,
-              finishSoundPath: counterEffect.finishSoundPath,
-            });
+            setSounds(counterEffect);
             setPlaySound(true);
           }}
           background={

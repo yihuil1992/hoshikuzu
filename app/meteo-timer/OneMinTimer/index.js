@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
   Box,
   Button,
@@ -10,7 +10,6 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import {FaMinus, FaPlus} from 'react-icons/fa';
-import useSound from 'use-sound';
 import {counterEffects} from '@/constants/soundEffects';
 import SoundSelector from '@/components/SoundSelector';
 
@@ -18,12 +17,10 @@ const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [seconds, setSeconds] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
   const [playSound, setPlaySound] = useState(true);
-  const [sounds, setSounds] = useState({
-    counterSoundPath: counterEffects[0].counterSoundPath,
-    finishSoundPath: counterEffects[0].finishSoundPath,
-  });
-  const [beepPlay] = useSound(sounds.counterSoundPath);
-  const [beepFinishPlay] = useSound(sounds.finishSoundPath);
+  const [sounds, setSounds] = useState(counterEffects[0]);
+
+  const [beepAudio, setBeepAudio] = useState(null);
+  const [beepFinishAudio, setBeepFinishAudio] = useState(null);
 
   const changeSounds = (newSounds) => {
     const newSoundIdx = counterEffects.findIndex((effect) => {
@@ -64,28 +61,29 @@ const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   useEffect(() => {
     const soundIdx = localStorage.getItem('blazeSoundIdx') || 1;
     const isSoundPlaying = localStorage.getItem('blazePlaySound');
-    setSounds({
-      counterSoundPath: counterEffects[soundIdx].counterSoundPath,
-      finishSoundPath: counterEffects[soundIdx].finishSoundPath,
-    });
+    setSounds(counterEffects[soundIdx]);
     if (isSoundPlaying) {
       setPlaySound(isSoundPlaying === 'true');
     }
   }, []);
 
-  const playBeep = useCallback(() => {
+  useEffect(() => {
     if (playSound && seconds > 0 && seconds < 5) {
-      beepPlay();
+      beepAudio.volume = sounds.volume;
+      beepAudio.load();
+      beepAudio.play();
     }
     if (playSound && seconds === 0) {
-      beepFinishPlay();
+      beepFinishAudio.volume = sounds.volume;
+      beepFinishAudio.load();
+      beepFinishAudio.play();
     }
-  }, [playSound, seconds, beepPlay, beepFinishPlay]);
+  }, [seconds]);
 
   useEffect(() => {
-    playBeep();
-  }, [playBeep]);
-
+    setBeepAudio(new Audio(sounds.counterSoundPath));
+    setBeepFinishAudio(new Audio(sounds.finishSoundPath));
+  }, [sounds]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);

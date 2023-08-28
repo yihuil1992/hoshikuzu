@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
   Box,
   Button,
@@ -11,7 +11,6 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import useSound from 'use-sound';
 import {FaMinus, FaPlus} from 'react-icons/fa';
 import s from './Keshizumi.module.css';
 import {counterEffects} from '@/constants/soundEffects';
@@ -22,12 +21,10 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   const [isThirty, setIsThirty] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [playSound, setPlaySound] = useState(true);
-  const [sounds, setSounds] = useState({
-    counterSoundPath: counterEffects[0].counterSoundPath,
-    finishSoundPath: counterEffects[0].finishSoundPath,
-  });
-  const [beepPlay] = useSound(sounds.counterSoundPath);
-  const [beepFinishPlay] = useSound(sounds.finishSoundPath);
+  const [sounds, setSounds] = useState(counterEffects[0]);
+
+  const [beepAudio, setBeepAudio] = useState(null);
+  const [beepFinishAudio, setBeepFinishAudio] = useState(null);
 
   const changeSounds = (newSounds) => {
     const newSoundIdx = counterEffects.findIndex((effect) => {
@@ -68,27 +65,29 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   useEffect(() => {
     const soundIdx = localStorage.getItem('keshizumiSoundIdx') || 0;
     const isSoundPlaying = localStorage.getItem('keshizumiPlaySound');
-    setSounds({
-      counterSoundPath: counterEffects[soundIdx].counterSoundPath,
-      finishSoundPath: counterEffects[soundIdx].finishSoundPath,
-    });
+    setSounds(counterEffects[soundIdx]);
     if (isSoundPlaying) {
       setPlaySound(isSoundPlaying === 'true');
     }
   }, []);
 
-  const playBeep = useCallback(() => {
-    if (playSound && seconds > 0 && seconds < 5) {
-      beepPlay();
-    }
-    if (playSound && seconds === 0) {
-      beepFinishPlay();
-    }
-  }, [playSound, seconds, beepPlay, beepFinishPlay]);
+  useEffect(() => {
+    setBeepAudio(new Audio(sounds.counterSoundPath));
+    setBeepFinishAudio(new Audio(sounds.finishSoundPath));
+  }, [sounds]);
 
   useEffect(() => {
-    playBeep();
-  }, [playBeep]);
+    if (playSound && seconds > 0 && seconds < 5) {
+      beepAudio.volume = sounds.volume;
+      beepAudio.load();
+      beepAudio.play();
+    }
+    if (playSound && seconds === 0) {
+      beepFinishAudio.volume = sounds.volume;
+      beepFinishAudio.load();
+      beepFinishAudio.play();
+    }
+  }, [seconds]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
