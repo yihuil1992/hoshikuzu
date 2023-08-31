@@ -16,10 +16,13 @@ import s from './Keshizumi.module.css';
 import {counterEffects} from '@/constants/soundEffects';
 import SoundSelector from '@/components/SoundSelector';
 
-const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
+const KeshizumiTimer = ({
+  resetSwitch,
+  setResetSwitch,
+  isRunning,
+  setIsRunning}) => {
   const [seconds, setSeconds] = useState(30);
   const [isThirty, setIsThirty] = useState(true);
-  const [isRunning, setIsRunning] = useState(false);
   const [playSound, setPlaySound] = useState(true);
   const [sounds, setSounds] = useState(counterEffects[0]);
 
@@ -56,11 +59,11 @@ const KeshizumiTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   }, [isRunning, isThirty]);
 
   useEffect(() => {
-    if (isGlobalRunning) {
+    if (resetSwitch) {
       handleReset();
-      setIsGlobalRunning(false);
+      setResetSwitch(false);
     }
-  }, [isGlobalRunning]);
+  }, [resetSwitch]);
 
   useEffect(() => {
     const soundIdx = localStorage.getItem('keshizumiSoundIdx') || 0;

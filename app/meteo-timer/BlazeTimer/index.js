@@ -13,9 +13,12 @@ import {FaMinus, FaPlus} from 'react-icons/fa';
 import {counterEffects} from '@/constants/soundEffects';
 import SoundSelector from '@/components/SoundSelector';
 
-const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
+const BlazeTimer = ({
+  resetSwitch,
+  setResetSwitch,
+  isRunning,
+  setIsRunning}) => {
   const [seconds, setSeconds] = useState(60);
-  const [isRunning, setIsRunning] = useState(false);
   const [playSound, setPlaySound] = useState(true);
   const [sounds, setSounds] = useState(counterEffects[0]);
 
@@ -52,11 +55,11 @@ const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   }, [isRunning]);
 
   useEffect(() => {
-    if (isGlobalRunning) {
+    if (resetSwitch) {
       handleReset();
-      setIsGlobalRunning(false);
+      setResetSwitch(false);
     }
-  }, [isGlobalRunning]);
+  }, [resetSwitch]);
 
   useEffect(() => {
     const soundIdx = localStorage.getItem('blazeSoundIdx') || 1;
@@ -165,4 +168,4 @@ const OneMinTimer = ({isGlobalRunning, setIsGlobalRunning}) => {
   );
 };
 
-export default OneMinTimer;
+export default BlazeTimer;
