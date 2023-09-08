@@ -119,9 +119,9 @@ const MeteoTimerPage = () => {
 
   useEffect(() => {
     setKeshizumiSoundId(Number(localStorage.getItem('keshizumiSoundId')) ||
-        0);
+        1);
     setBlazeSoundId(Number(localStorage.getItem('blazeSoundId')) ||
-        0);
+        2);
   }, []);
 
   return (
