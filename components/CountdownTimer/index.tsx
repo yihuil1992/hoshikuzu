@@ -2,7 +2,6 @@ import { counterEffects } from '@/constants/soundEffects';
 import React, { useEffect, useState } from 'react';
 import {
   ActionIcon,
-  Box,
   Button,
   Center,
   Flex,

@@ -11,7 +11,6 @@ export const metadata = {
   description: '',
 };
 
-// eslint-disable-next-line require-jsdoc
 export default function RootLayout({
   children,
 }: Readonly<{

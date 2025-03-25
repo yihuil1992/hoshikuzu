@@ -1,8 +1,5 @@
-// eslint-disable-next-line require-jsdoc
+import StarField from '@/components/StarField';
+
 export default function Home() {
-  return (
-    <div>
-      ほしくずへようこそ
-    </div>
-  );
+  return <StarField />;
 }
