@@ -1,8 +1,9 @@
 'use client';
-import {Button, Divider, HStack, VStack} from '@chakra-ui/react';
-import {useEffect, useState} from 'react';
+
+import { useEffect, useState } from 'react';
 import CountdownTimer from '@/components/CountdownTimer';
-import KBaseSeconds from '@/app/meteo-timer/KBaseSeconds';
+import KBaseSeconds from '@/components/KBaseSeconds';
+import { Button, Divider, Group, Stack } from '@mantine/core';
 
 const MeteoTimerPage = () => {
   const [isKeshizumiRunning, setIsKeshizumiRunning] = useState(false);
@@ -12,6 +13,9 @@ const MeteoTimerPage = () => {
   const [isBlazeRunning, setIsBlazeRunning] = useState(false);
   const [blazeSeconds, setBlazeSeconds] = useState(60);
   const [blazeSoundId, setBlazeSoundId] = useState(0);
+
+  const blazeMaxSeconds = 60;
+  const keshizumiMaxSeconds = isKeshizumiThirty ? 30 : 32;
 
   const keshizumiStartStopHandler = () => {
     setIsKeshizumiRunning(!isKeshizumiRunning);
@@ -39,9 +43,9 @@ const MeteoTimerPage = () => {
     setIsKeshizumiThirty(!isKeshizumiThirty);
   };
 
-  const keshizumiSoundSwitchHandler = (soundId) => {
+  const keshizumiSoundSwitchHandler = (soundId: number) => {
     setKeshizumiSoundId(soundId);
-    localStorage.setItem('keshizumiSoundId', soundId);
+    localStorage.setItem('keshizumiSoundId', soundId.toString());
   };
 
   const blazeStartStopHandler = () => {
@@ -65,9 +69,9 @@ const MeteoTimerPage = () => {
     }
   };
 
-  const blazeSoundSwitchHandler = (soundId) => {
+  const blazeSoundSwitchHandler = (soundId: number) => {
     setBlazeSoundId(soundId);
-    localStorage.setItem('blazeSoundId', soundId);
+    localStorage.setItem('blazeSoundId', soundId.toString());
   };
 
   const resetBoth = () => {
@@ -86,7 +90,7 @@ const MeteoTimerPage = () => {
   };
 
   useEffect(() => {
-    let interval = null;
+    let interval: NodeJS.Timeout | undefined;
     if (isBlazeRunning) {
       interval = setInterval(() => {
         setBlazeSeconds((prevSeconds) => {
@@ -102,7 +106,7 @@ const MeteoTimerPage = () => {
   }, [isBlazeRunning]);
 
   useEffect(() => {
-    let interval = null;
+    let interval: NodeJS.Timeout | undefined;
     if (isKeshizumiRunning) {
       interval = setInterval(() => {
         setKeshizumiSeconds((prevSeconds) => {
@@ -118,51 +122,56 @@ const MeteoTimerPage = () => {
   }, [isKeshizumiRunning, isKeshizumiThirty]);
 
   useEffect(() => {
-    setKeshizumiSoundId(Number(localStorage.getItem('keshizumiSoundId')) ||
-        1);
-    setBlazeSoundId(Number(localStorage.getItem('blazeSoundId')) ||
-        2);
+    setKeshizumiSoundId(Number(localStorage.getItem('keshizumiSoundId')) || 1);
+    setBlazeSoundId(Number(localStorage.getItem('blazeSoundId')) || 2);
   }, []);
 
   return (
-    <VStack>
+    <Stack>
       <CountdownTimer
         title={'消し炭'}
         seconds={keshizumiSeconds}
+        maxSeconds={keshizumiMaxSeconds}
         isRunning={isKeshizumiRunning}
         soundId={keshizumiSoundId}
-        customComponent={<KBaseSeconds
-          isThirty={isKeshizumiThirty}
-          switchThirty={switchKeishizumiThirty} />}
+        customComponent={
+          <KBaseSeconds
+            isThirty={isKeshizumiThirty}
+            switchThirty={switchKeishizumiThirty}
+          />
+        }
         minusHandler={keshizumiMinusHandler}
         plusHandler={keshizumiPlusHandler}
         startStopHandler={keshizumiStartStopHandler}
         resetHandler={keshizumiResetHandler}
-        switchSoundHandler={keshizumiSoundSwitchHandler}/>
+        switchSoundHandler={keshizumiSoundSwitchHandler}
+      />
       <CountdownTimer
         title={'範囲技'}
         seconds={blazeSeconds}
+        maxSeconds={blazeMaxSeconds}
         isRunning={isBlazeRunning}
         soundId={blazeSoundId}
         minusHandler={blazeMinusHandler}
         plusHandler={blazePlusHandler}
         startStopHandler={blazeStartStopHandler}
         resetHandler={blazeResetHandler}
-        switchSoundHandler={blazeSoundSwitchHandler}/>
+        switchSoundHandler={blazeSoundSwitchHandler}
+      />
       <Divider />
-      <HStack>
+      <Group justify={'center'}>
         <Button
-          colorScheme={isBlazeRunning || isKeshizumiRunning ? 'red' : 'green'}
-          onClick={isBlazeRunning || isKeshizumiRunning ? stopBoth : startBoth}>
+          size={'md'}
+          color={isBlazeRunning || isKeshizumiRunning ? 'red' : 'blue.5'}
+          onClick={isBlazeRunning || isKeshizumiRunning ? stopBoth : startBoth}
+        >
           {isBlazeRunning || isKeshizumiRunning ? 'Stop Both' : 'Start Both'}
         </Button>
-        <Button
-          colorScheme={'blue'}
-          onClick={resetBoth}>
-              Reset Both
+        <Button color={'blue.5'} onClick={resetBoth} size={'md'}>
+          Reset Both
         </Button>
-      </HStack>
-    </VStack>
+      </Group>
+    </Stack>
   );
 };
 
