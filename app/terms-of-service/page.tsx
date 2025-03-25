@@ -8,7 +8,7 @@ export default function TermsOfService() {
       <Text>
         By using Hoshikuzu Starfield, you agree to use this experience for
         personal and non-commercial purposes only. All visual and interactive
-        content is provided "as-is" without warranty.
+        content is provided &#34;as-is&#34; without warranty.
       </Text>
       <Space h="md" />
       <Text>

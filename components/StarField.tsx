@@ -1,7 +1,7 @@
 'use client';
 
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useRef, useState, useMemo, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import { Mesh } from 'three';
 import { Modal, Text } from '@mantine/core';
