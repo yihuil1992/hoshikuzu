@@ -4,10 +4,11 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import { Mesh } from 'three';
-import { Modal, Text } from '@mantine/core';
+import { Anchor, Modal, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { OrbitControls, Stars, Html, Trail } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import NextLink from 'next/link';
 
 function getRandomPosition(radius = 4) {
   const theta = Math.random() * 2 * Math.PI;
@@ -163,6 +164,23 @@ export default function StarField() {
           Hoshikuzu Starfield
         </Text>
       </div>
+
+      <Anchor
+        href={'/privacy-policy'}
+        component={NextLink}
+        style={{
+          position: 'absolute',
+          bottom: '1rem',
+          right: '1rem',
+          color: 'white',
+          fontSize: '0.9rem',
+          opacity: 0.7,
+          zIndex: 20,
+          textDecoration: 'underline',
+        }}
+      >
+        Privacy Policy
+      </Anchor>
 
       <Canvas style={{ width: '100vw', height: '100vh', background: 'black' }}>
         <ambientLight intensity={0.5} />
