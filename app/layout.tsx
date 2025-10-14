@@ -1,10 +1,7 @@
 import './globals.css';
-import Providers from './providers';
 import React from 'react';
-import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
 import { GoogleAnalytics } from '@next/third-parties/google';
-
-import '@mantine/core/styles.css';
+import Providers from './providers';
 
 export const metadata = {
   title: 'ほしくず',
@@ -17,10 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" {...mantineHtmlProps}>
-      <head>
-        <ColorSchemeScript />
-      </head>
+    <html lang="en">
+      <head></head>
       <body>
         <Providers>{children}</Providers>
       </body>

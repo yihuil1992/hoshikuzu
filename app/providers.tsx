@@ -1,4 +1,3 @@
-import { MantineProvider } from '@mantine/core';
 import React from 'react';
 
 const Providers = ({
@@ -6,7 +5,7 @@ const Providers = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  return <MantineProvider>{children}</MantineProvider>;
+  return <>{children}</>;
 };
 
 export default Providers;
