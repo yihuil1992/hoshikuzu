@@ -122,10 +122,12 @@ export default function WorksPage() {
                   <CardDescription>{item.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <SitePreview url={item.url} title={item.title} />
-                  <div className="absolute inset-0 grid place-items-center">
-                    <div className="rounded-md bg-foreground/5 px-3 py-1 text-xs text-foreground/70">
-                      Project cover — replace with screenshot
+                  <div className="relative">
+                    <SitePreview url={item.url} title={item.title} />
+                    <div className="absolute inset-0 grid place-items-center">
+                      <div className="rounded-md bg-foreground/5 px-3 py-1 text-xs text-foreground/70">
+                        Project cover — replace with screenshot
+                      </div>
                     </div>
                   </div>
 
