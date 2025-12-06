@@ -17,18 +17,29 @@ type ExpCalculatorTableProps = {
   rows: Row[];
 };
 
+// NOTE: HP 与 BaseExp 都放在 Name 下方，因此表头不需要再加新列
+const HEADER_COLS: { key: string; label: string; className?: string }[] = [
+  { key: 'playerLevel', label: 'レベル', className: 'w-[80px]' },
+  { key: 'rank', label: '順位', className: 'w-[60px]' },
+  { key: 'name', label: 'モンスター' },
+  { key: 'monsterLevel', label: 'モブLv', className: 'text-right' },
+  { key: 'diff', label: 'レベル差', className: 'text-right' },
+  { key: 'expPerKill', label: '経験値 / 1体', className: 'text-right' },
+  { key: 'killsToLevel', label: '必要討伐数', className: 'text-right' },
+  { key: 'timePerKillSec', label: '討伐時間 (秒)', className: 'text-right' },
+  { key: 'timeToLevelSec', label: 'レベルアップまで (時間)', className: 'text-right' },
+];
+
 export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
   if (!rows.length) return null;
 
-  // rows 已经按 level + rank 排好序了
   const bodyRows: JSX.Element[] = [];
   let lastLevel: number | null = null;
-  let isAltGroup = false; // 用于实现“按 level 斑马纹”的标记
+  let isAltGroup = false;
 
   for (const row of rows) {
     const levelChanged = row.playerLevel !== lastLevel;
 
-    // 每个 level 前插入一行组头
     if (levelChanged) {
       isAltGroup = !isAltGroup;
       const groupHeaderBg = isAltGroup ? 'bg-muted/70' : 'bg-muted/40';
@@ -39,13 +50,14 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
           className={`${groupHeaderBg} hover:${groupHeaderBg} border-t`}
         >
           <TableCell
-            colSpan={9}
+            colSpan={HEADER_COLS.length}
             className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
           >
             Level {row.playerLevel}
           </TableCell>
         </TableRow>,
       );
+
       lastLevel = row.playerLevel;
     }
 
@@ -56,21 +68,38 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
         key={`${row.playerLevel}-${row.rank}-${row.id}`}
         className={`hover:bg-muted/40 ${groupRowBg} ${row.rank === 1 ? 'bg-primary/5' : ''}`}
       >
-        {/* Level 列：在普通行中隐藏（内容透明，保留列宽） */}
+        {/* Level 列隐藏文本但保留宽度 */}
         <TableCell className="text-xs text-transparent select-none">{row.playerLevel}</TableCell>
+
         <TableCell className="text-xs text-muted-foreground">{row.rank}</TableCell>
-        <TableCell className="max-w-[180px] truncate">{row.name}</TableCell>
+
+        {/* 🆕 Name + HP + EXP（两行显示） */}
+        <TableCell className="max-w-[220px]">
+          <div className="flex flex-col leading-tight">
+            <span className="truncate">{row.name}</span>
+
+            <span className="text-[10px] text-muted-foreground truncate">
+              HP: {row.hp.toLocaleString()} ・ EXP: {row.baseExp}%
+            </span>
+          </div>
+        </TableCell>
+
         <TableCell className="text-right tabular-nums text-xs">{row.monsterLevel}</TableCell>
+
         <TableCell className="text-right tabular-nums text-xs">
           {row.diff >= 0 ? `+${row.diff}` : row.diff}
         </TableCell>
+
         <TableCell className="text-right tabular-nums text-xs">
           {row.expPerKill.toFixed(4)}%
         </TableCell>
+
         <TableCell className="text-right tabular-nums text-xs">{row.killsToLevel}</TableCell>
+
         <TableCell className="text-right tabular-nums text-xs">
           {row.timePerKillSec.toFixed(2)}
         </TableCell>
+
         <TableCell className="text-right tabular-nums text-xs">
           {(row.timeToLevelSec / 3600).toFixed(1)}
         </TableCell>
@@ -86,19 +115,16 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
           指定したレベル範囲内で、各レベルごとのおすすめモンスターと経験値・時間の目安です。
         </CardDescription>
       </CardHeader>
+
       <CardContent className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[80px]">レベル</TableHead>
-              <TableHead className="w-[60px]">順位</TableHead>
-              <TableHead>モンスター</TableHead>
-              <TableHead className="text-right">モブLv</TableHead>
-              <TableHead className="text-right">レベル差</TableHead>
-              <TableHead className="text-right">経験値 / 1体</TableHead>
-              <TableHead className="text-right">必要討伐数</TableHead>
-              <TableHead className="text-right">討伐時間 (秒)</TableHead>
-              <TableHead className="text-right">レベルアップまで (時間)</TableHead>
+              {HEADER_COLS.map((col) => (
+                <TableHead key={col.key} className={col.className}>
+                  {col.label}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>{bodyRows}</TableBody>
