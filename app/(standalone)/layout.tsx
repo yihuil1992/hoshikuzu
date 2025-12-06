@@ -1,5 +1,4 @@
 'use client';
-import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 
 import BackHomeButton from '@/components/back-home-button';

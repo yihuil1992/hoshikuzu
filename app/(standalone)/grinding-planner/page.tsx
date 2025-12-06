@@ -6,6 +6,7 @@ import { ExpCalculatorChart } from '@/components/grinding-planner/exp-calculator
 import { ExpCalculatorForm } from '@/components/grinding-planner/exp-calculator-form';
 import { ExpCalculatorHero } from '@/components/grinding-planner/exp-calculator-hero';
 import { ExpCalculatorTable } from '@/components/grinding-planner/exp-calculator-table';
+import { LevelPenaltyChartCard } from '@/components/grinding-planner/level-penalty-chart-card';
 import { Separator } from '@/components/ui/separator';
 import { computeBestMobs, MonsterScore } from '@/lib/exp-calculate';
 
@@ -53,21 +54,32 @@ export default function GrindingPlannerPage() {
       <Separator className="mx-auto max-w-5xl" />
 
       <section className="space-y-8 px-6 py-10 sm:px-10 md:px-16 lg:px-20">
-        <ExpCalculatorForm
-          onCalculate={({
-            startLevel,
-            endLevel,
-            extraExpMultiplier,
-            baseDps,
-            topN,
-            onlyNormal,
-          }) => {
-            const data = computeBestMobs(startLevel, endLevel, extraExpMultiplier, baseDps, topN, {
+        {/* 顶部：表单 + 等级惩罚图 */}
+        <div className="grid gap-4 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <ExpCalculatorForm
+            onCalculate={({
+              startLevel,
+              endLevel,
+              extraExpMultiplier,
+              baseDps,
+              topN,
               onlyNormal,
-            });
-            setResult(data);
-          }}
-        />
+            }) => {
+              const data = computeBestMobs(
+                startLevel,
+                endLevel,
+                extraExpMultiplier,
+                baseDps,
+                topN,
+                {
+                  onlyNormal,
+                },
+              );
+              setResult(data);
+            }}
+          />
+          <LevelPenaltyChartCard />
+        </div>
 
         <div className="space-y-6">
           <ExpCalculatorChart data={chartData} />
@@ -76,7 +88,7 @@ export default function GrindingPlannerPage() {
 
         <div className="mx-auto max-w-5xl rounded-xl border bg-card p-4 text-xs text-muted-foreground">
           ここでの計算結果は HP・経験値テーブル・レベル補正などに基づいた概算です。
-          実際の効率は装備・PT構成・ラグなどによって変動するため、
+          実際の効率は装備・沸き具合・ラグなどによって変動するため、
           厳密なシミュレーターではなくレベリング計画用の目安として利用してください。
         </div>
       </section>
