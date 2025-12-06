@@ -102,7 +102,8 @@ function computeScoresForLevel(
     if (!baseExp) continue;
 
     // 每只怪实际能拿到的经验（百分比，已经乘上经验药水倍率）
-    const expPerKill = baseExp * penalty.expSolo * extraExpMultiplier;
+    // 不需要考虑经验惩罚，因为 baseExp 已经是当前等级的经验值
+    const expPerKill = baseExp * extraExpMultiplier;
 
     // 效率评分（单位时间经验的近似）：经验 * 伤害倍率 / HP
     const score = (expPerKill * penalty.damage) / m.hp;
