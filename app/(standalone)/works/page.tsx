@@ -5,6 +5,7 @@ import { ExternalLink, Globe, Sparkles, Github } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { MotionDiv } from '@/components/motion-div';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -79,7 +80,7 @@ export default function WorksPage() {
     <div className="min-h-dvh bg-[radial-gradient(1200px_600px_at_50%_-100px,theme(colors.sky.100/.6),transparent),radial-gradient(800px_400px_at_120%_-50px,theme(colors.pink.100/.6),transparent)]">
       {/* Hero */}
       <section className="relative px-6 sm:px-10 md:px-16 lg:px-20 pt-16 pb-8">
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -94,7 +95,7 @@ export default function WorksPage() {
           <p className="mt-3 text-balance text-muted-foreground">
             A tiny gallery of production sites I designed & built.
           </p>
-        </motion.div>
+        </MotionDiv>
       </section>
 
       <Separator className="mx-auto max-w-6xl" />
@@ -103,7 +104,7 @@ export default function WorksPage() {
       <section className="px-6 sm:px-10 md:px-16 lg:px-20 py-10">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2">
           {items.map((item, i) => (
-            <motion.div
+            <MotionDiv
               key={item.title}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -158,7 +159,7 @@ export default function WorksPage() {
                   )}
                 </CardFooter>
               </Card>
-            </motion.div>
+            </MotionDiv>
           ))}
         </div>
       </section>
@@ -170,6 +171,7 @@ export default function WorksPage() {
         </div>
       </section>
 
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <style jsx global>{`
         @keyframes shimmer {
           0% {

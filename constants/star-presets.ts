@@ -26,4 +26,12 @@ export const presetStars: PresetStar[] = [
     emissive: '#ff69c7',
     position: new THREE.Vector3(2.5, -1.0, 0),
   },
+  {
+    name: 'Grinding Planner',
+    url: '/grinding-planner',
+    description: 'Optimize your monster grinding routes and experience gains.',
+    color: '#baffc9',
+    emissive: '#69ff9e',
+    position: new THREE.Vector3(0, 0, 0),
+  },
 ];
