@@ -34,4 +34,12 @@ export const presetStars: PresetStar[] = [
     emissive: '#69ff9e',
     position: new THREE.Vector3(0, 0, 0),
   },
+  {
+    name: 'Discord Bot',
+    url: '/discord-bot',
+    description: 'A bot for Flyff Universe servers.',
+    color: '#ffdfba',
+    emissive: '#ffb347',
+    position: new THREE.Vector3(-1.5, -0.5, 0),
+  },
 ];

@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-
 import { useMemo } from 'react';
+
 import CountdownCard from '@/components/timers/countdown-card';
 import SecondsSwitch from '@/components/timers/seconds-switch';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { useCountdown } from '@/hooks/use-countdown';
-import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useCountdownSounds } from '@/hooks/use-countdown-sounds';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 export default function MeteoTimerPage() {
   // 消し炭：30/32 交替
