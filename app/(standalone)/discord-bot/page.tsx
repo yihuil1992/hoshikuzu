@@ -129,13 +129,13 @@ export default function BotPage() {
     () => [
       {
         icon: Bell,
-        title: 'ランキングを監視して通知',
-        desc: '指定したチャンネルにランキング監視の更新を自動で通知します。',
+        title: 'ランキングの動向をチェックして通知',
+        desc: '指定したチャンネルに、ランキングの更新情報を自動で通知します。',
       },
       {
         icon: Users,
         title: 'ギルドをフォローして履歴を見る',
-        desc: '監視したいギルドを登録し、変動の履歴をコマンドで確認できます。',
+        desc: '対象のギルドを登録し、所属変動などの履歴をコマンドから確認できます。',
       },
       {
         icon: Sparkles,
@@ -154,18 +154,18 @@ export default function BotPage() {
   const commands = useMemo(
     () => [
       {
-        group: 'ギルド監視',
+        group: 'ギルドチェック',
         icon: Users,
         accent: 'from-emerald-500 via-green-600 to-teal-500',
         items: [
           {
             cmd: '/guild watch name:<ギルド名>',
-            desc: '指定した Flyff ギルドをフォロー（監視対象に追加）します。',
+            desc: '指定した Flyff ギルドをフォロー（対象に追加）します。',
             example: "/guild watch name:'ExampleGuild'",
           },
           {
             cmd: '/guild unwatch name:<ギルド名>',
-            desc: '指定した Flyff ギルドのフォローを解除（監視対象から削除）します。',
+            desc: '指定した Flyff ギルドのフォローを解除（対象から削除）します。',
             example: "/guild unwatch name:'ExampleGuild'",
           },
           {
@@ -180,13 +180,13 @@ export default function BotPage() {
         ],
       },
       {
-        group: 'ランキング監視',
+        group: 'ランキング通知設定',
         icon: Bell,
         accent: 'from-sky-500 via-blue-600 to-indigo-500',
         items: [
           {
             cmd: '/rank channel target:<チャンネル>',
-            desc: 'ランキング監視の通知チャンネルを設定します。',
+            desc: 'ランキング更新通知を送信するチャンネルを設定します。',
             example: '#rank-watch を指定',
           },
         ],
@@ -263,9 +263,9 @@ export default function BotPage() {
             </div>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">できること</h2>
             <p className="mt-2 text-muted-foreground">
-              Flyff のランキングを継続監視し、ランキング上のプレイヤーの
+              Flyff のランキングを定期的にチェックし、
               <strong>ギルド所属変動</strong>を検知して通知します。
-              監視対象ギルドの登録・解除・一覧表示・履歴確認まで、最小限の操作で完結します。
+              対象ギルドの登録・解除・一覧表示・履歴確認まで、最小限の操作で完結します。
             </p>
           </MotionDiv>
 
