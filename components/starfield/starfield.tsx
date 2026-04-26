@@ -78,6 +78,7 @@ export default function StarField() {
   // 选中 & 面板
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [focusTarget, setFocusTarget] = useState<THREE.Vector3 | null>(null);
   const selectedStar = selectedIndex !== null ? stars[selectedIndex] : null;
 
   // 相机阶段由 CameraFocus 回调驱动
@@ -98,27 +99,31 @@ export default function StarField() {
       if (e.key === 'Escape') {
         setOpen(false);
         setSelectedIndex(null);
+        setFocusTarget(null);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const handleStarClick = (index: number) => {
+  const handleStarClick = (index: number, worldPosition: THREE.Vector3) => {
     setSelectedIndex(index);
+    setFocusTarget(worldPosition.clone());
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false); // 进入 restoring，回到原视角
     setSelectedIndex(null);
+    setFocusTarget(null);
   };
 
   return (
     <>
       {/* 3D 背景层 */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 bg-[#02040a]">
         <Canvas
+          className="absolute inset-0"
           gl={{ alpha: false }}
           camera={{ position: [0, 0, 9.5], fov: 50 }}
           onPointerMissed={() => {
@@ -143,7 +148,7 @@ export default function StarField() {
 
           <CameraFocus
             controlsRef={controlsRef}
-            target={selectedIndex !== null ? starWorldPositionRefs[selectedIndex].current : null}
+            target={focusTarget}
             active={open}
             zoomFactor={0.13}
             inDamp={5.4}
@@ -255,14 +260,6 @@ export default function StarField() {
 
       {/* 前景 UI 层（不挡拖拽；真正可点元素单独开 pointer-events） */}
       <div className="pointer-events-none fixed inset-0 z-10">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(110deg, rgba(2,4,10,0.5) 0%, rgba(2,4,10,0.22) 22%, transparent 48%, rgba(2,4,10,0.18))',
-          }}
-        />
-
         <section className="absolute left-6 top-6 max-w-[min(26rem,calc(100vw-3rem))] text-white sm:left-10 sm:top-9">
           <div className="mb-4 h-px w-20 bg-gradient-to-r from-white/55 to-transparent" />
           <p

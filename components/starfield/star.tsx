@@ -12,7 +12,7 @@ import type { MutableRefObject } from 'react';
 export type StarProps = {
   position: THREE.Vector3;
   index: number;
-  onClick: (index: number) => void;
+  onClick: (index: number, worldPosition: THREE.Vector3) => void;
   color: string;
   emissive: string; // 保留兼容
   name: string;
@@ -41,8 +41,7 @@ export function Star({
   densityScale = 1,
   worldPositionRef,
 }: StarProps) {
-  const [auraTexture, coreTexture, glintTexture] = useTexture([
-    '/star-assets/active/aura-kenney-circle-05.png',
+  const [coreTexture, glintTexture] = useTexture([
     '/star-assets/active/core-circle-05.png',
     '/star-assets/active/glint-star-04.png',
   ]);
@@ -51,18 +50,17 @@ export function Star({
   const innerRef = useRef<THREE.Mesh>(null); // 亮内核
   const coreRef = useRef<THREE.Mesh>(null); // 星点核心
   const glintRef = useRef<THREE.Mesh>(null); // 锐光星芒
-  const outerRef = useRef<THREE.Mesh>(null); // 外光晕
   const hoverMix = useRef(0);
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
-    [auraTexture, coreTexture, glintTexture].forEach((texture) => {
+    [coreTexture, glintTexture].forEach((texture) => {
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.wrapS = THREE.ClampToEdgeWrapping;
       texture.wrapT = THREE.ClampToEdgeWrapping;
       texture.needsUpdate = true;
     });
-  }, [auraTexture, coreTexture, glintTexture]);
+  }, [coreTexture, glintTexture]);
 
   // 每颗星的随机参数
   const phase = useMemo(() => seededUnit(index, 1) * Math.PI * 2, [index]);
@@ -84,19 +82,6 @@ export function Star({
     [baseColor, hueJitter],
   );
 
-  const outerMat = useMemo(
-    () =>
-      new THREE.MeshBasicMaterial({
-        map: auraTexture,
-        color: brightColor.clone().lerp(new THREE.Color('#dff8ff'), 0.42),
-        transparent: true,
-        opacity: 0.18,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        depthTest: false,
-      }),
-    [auraTexture, brightColor],
-  );
   const innerMat = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
@@ -224,15 +209,6 @@ export function Star({
       coreMaterial.uniforms.uTime.value = t;
       coreMaterial.uniforms.uHover.value = hoverMix.current;
     }
-    if (outerRef.current) {
-      const s = outerRef.current.scale.x || 1;
-      const target = scale * 1.68 * (0.98 + 0.02 * Math.sin(t * 0.23 + phase));
-      const next = THREE.MathUtils.damp(s, target, 5, dt);
-      outerRef.current.scale.set(next * 1.08, next, next);
-      outerRef.current.rotation.z = t * 0.035 + phase;
-      const outerMaterial = outerRef.current.material as THREE.MeshBasicMaterial;
-      outerMaterial.opacity = 0.07 * distanceScale * (0.88 + 0.12 * pulse);
-    }
     if (glintRef.current) {
       const target = scale * 0.72 * (0.96 + hoverMix.current * 0.18);
       glintRef.current.scale.set(target, target, target);
@@ -260,20 +236,20 @@ export function Star({
       <Billboard>
         <mesh
           ref={hitRef}
-          onClick={() => onClick(index)}
+          onClick={() => {
+            const focusPosition = new THREE.Vector3();
+            if (groupRef.current) {
+              groupRef.current.getWorldPosition(focusPosition);
+            } else {
+              focusPosition.copy(position);
+            }
+            onClick(index, focusPosition);
+          }}
           onPointerOver={() => setHovered(true)}
           onPointerOut={() => setHovered(false)}
         >
           <planeGeometry args={[1, 1]} />
           <primitive object={hitMat} attach="material" />
-        </mesh>
-      </Billboard>
-
-      {/* 贴图光球：素材负责柔边，交互由透明热区单独负责。 */}
-      <Billboard>
-        <mesh ref={outerRef}>
-          <planeGeometry args={[1, 1]} />
-          <primitive object={outerMat} attach="material" />
         </mesh>
       </Billboard>
 

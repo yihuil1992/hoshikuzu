@@ -33,10 +33,11 @@ export default function CameraFocus({
 
   const prevCam = useRef(new THREE.Vector3());
   const prevTarget = useRef(new THREE.Vector3());
-
-  // 进入聚焦当下的方向与距离（保证拖拽后再点也能居中）
-  const focusDir = useRef(new THREE.Vector3());
-  const focusDist = useRef(0);
+  const startCam = useRef(new THREE.Vector3());
+  const startTarget = useRef(new THREE.Vector3());
+  const endCam = useRef(new THREE.Vector3());
+  const endTarget = useRef(new THREE.Vector3());
+  const progress = useRef(1);
 
   const mode = useRef<CameraPhase>('idle');
   const wasActive = useRef(false);
@@ -67,10 +68,23 @@ export default function CameraFocus({
     const controls = controlsRef.current;
     if (!controls) return;
 
-    // 工具函数：基于“当前相机与当前 controls.target”刷新聚焦向量与距离
-    const refreshFocusVector = () => {
-      focusDir.current.copy(camera.position).sub(controls.target).normalize();
-      focusDist.current = camera.position.distanceTo(controls.target);
+    const beginMove = (nextTarget: THREE.Vector3, speed: CameraPhase) => {
+      const focusDir = new THREE.Vector3().copy(camera.position).sub(controls.target);
+      const focusDist = focusDir.length();
+      if (focusDist > 0.0001) {
+        focusDir.normalize();
+      } else {
+        focusDir.set(0, 0, 1);
+      }
+
+      startCam.current.copy(camera.position);
+      startTarget.current.copy(controls.target);
+      endTarget.current.copy(nextTarget);
+      const minDistance = controls.minDistance || 0;
+      const desiredDistance = Math.max(focusDist * zoomFactor, minDistance);
+      endCam.current.copy(nextTarget).add(focusDir.multiplyScalar(desiredDistance));
+      progress.current = 0;
+      setPhase(speed);
     };
 
     if (active && target) {
@@ -78,59 +92,53 @@ export default function CameraFocus({
       if (!wasActive.current) {
         prevCam.current.copy(camera.position);
         prevTarget.current.copy(controls.target);
-        refreshFocusVector();
         lastFocusTarget.current.copy(target);
-        setPhase('focusing');
+        beginMove(target, 'focusing');
       } else {
         // 2) 已在聚焦状态下点了另一颗星：检测目标是否变化，变化则重新聚焦
         if (!target.equals(lastFocusTarget.current)) {
           // 不覆盖 prevCam/prevTarget，确保最后关闭还能回到最初视角
-          refreshFocusVector();
           lastFocusTarget.current.copy(target);
-          setPhase('focusing');
+          beginMove(target, 'focusing');
         }
       }
     } else if (!active && wasActive.current) {
       // 离开聚焦 → 恢复
+      startCam.current.copy(camera.position);
+      startTarget.current.copy(controls.target);
+      endCam.current.copy(prevCam.current);
+      endTarget.current.copy(prevTarget.current);
+      progress.current = 0;
       setPhase('restoring');
     }
 
     wasActive.current = active;
-  }, [active, target, camera, controlsRef, setPhase]);
+  }, [active, target, camera, controlsRef, setPhase, zoomFactor]);
 
   useFrame((_, dt) => {
     const controls = controlsRef.current;
     if (!controls) return;
 
-    if ((mode.current === 'focusing' || (active && target)) && target) {
-      const desiredPos = new THREE.Vector3()
-        .copy(target)
-        .add(focusDir.current.clone().multiplyScalar(focusDist.current * zoomFactor));
-
-      const k = Math.min(1, dt * (mode.current === 'focusing' ? inDamp : inDamp * 1.4));
-      camera.position.lerp(desiredPos, k);
-      controls.target.lerp(target, k);
+    if (mode.current === 'focusing') {
+      progress.current = Math.min(1, progress.current + dt * inDamp);
+      const t = 1 - Math.pow(1 - progress.current, 4);
+      camera.position.lerpVectors(startCam.current, endCam.current, t);
+      controls.target.lerpVectors(startTarget.current, endTarget.current, t);
       camera.lookAt(controls.target);
 
-      if (
-        mode.current === 'focusing' &&
-        camera.position.distanceTo(desiredPos) < 0.01 &&
-        controls.target.distanceTo(target) < 0.005
-      ) {
+      if (progress.current >= 1) {
         setPhase('idle');
       }
     }
 
     if (mode.current === 'restoring') {
-      const k = Math.min(1, dt * outDamp);
-      camera.position.lerp(prevCam.current, k);
-      controls.target.lerp(prevTarget.current, k);
+      progress.current = Math.min(1, progress.current + dt * outDamp);
+      const t = 1 - Math.pow(1 - progress.current, 4);
+      camera.position.lerpVectors(startCam.current, endCam.current, t);
+      controls.target.lerpVectors(startTarget.current, endTarget.current, t);
       camera.lookAt(controls.target);
 
-      if (
-        camera.position.distanceTo(prevCam.current) < 0.01 &&
-        controls.target.distanceTo(prevTarget.current) < 0.005
-      ) {
+      if (progress.current >= 1) {
         setPhase('idle');
       }
     }
