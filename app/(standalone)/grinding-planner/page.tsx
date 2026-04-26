@@ -85,7 +85,7 @@ export default function GrindingPlannerPage() {
           <ExpCalculatorTable rows={flatRows} />
         </div>
 
-        <div className="mx-auto max-w-5xl border border-white/14 bg-card/70 p-4 text-xs leading-6 text-muted-foreground">
+        <div className="mx-auto max-w-5xl border border-border bg-card/70 p-4 text-xs leading-6 text-muted-foreground">
           ここでの計算結果は HP・経験値テーブル・レベル補正などに基づいた概算です。
           実際の効率は装備・沸き具合・ラグなどによって変動するため、
           厳密なシミュレーターではなくレベリング計画用の目安として利用してください。

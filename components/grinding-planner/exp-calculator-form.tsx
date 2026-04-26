@@ -155,7 +155,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
     <Card className="mx-auto max-w-5xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 normal-case tracking-normal">
-          <LineChartIcon className="h-5 w-5 text-[#aad7dc]" />
+          <LineChartIcon className="h-5 w-5 text-accent" />
           レベリング設定
         </CardTitle>
         <CardDescription>
@@ -169,7 +169,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="border border-white/12 bg-white/[0.03] px-3 py-3 md:px-4 md:py-4">
+        <div className="border border-border bg-secondary/35 px-3 py-3 md:px-4 md:py-4">
           <div className="grid gap-4 md:grid-cols-5">
             {/* レベル帯 */}
             <div className="space-y-1">
@@ -260,7 +260,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
           </div>
 
           {/* 野外のみトグル */}
-          <div className="mt-4 flex items-start justify-between gap-4 border border-white/10 bg-background/60 px-3 py-2">
+          <div className="mt-4 flex items-start justify-between gap-4 border border-border bg-background/60 px-3 py-2">
             <div className="space-y-0.5">
               <div className="text-xs font-medium">フィールドモンスターのみ</div>
               <p className="text-[11px] text-muted-foreground">

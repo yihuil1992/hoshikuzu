@@ -14,14 +14,14 @@ export default function PrivacyPolicy() {
           <CardTitle className="text-2xl font-light tracking-normal text-foreground">
             Privacy Policy
           </CardTitle>
-          <CardDescription className="text-[#c7d0dd]">
+          <CardDescription className="text-muted-foreground">
             How Hoshikuzu Starfield handles your data.
           </CardDescription>
         </CardHeader>
 
         <Separator className="mx-6" />
 
-        <CardContent className="max-w-none space-y-4 py-6 text-sm leading-6 text-[#c7d0dd]">
+        <CardContent className="max-w-none space-y-4 py-6 text-sm leading-6 text-muted-foreground">
           <p>
             Hoshikuzu Starfield does not collect or store any personal data. All interactions remain
             on your device, and no information is transmitted to any servers.

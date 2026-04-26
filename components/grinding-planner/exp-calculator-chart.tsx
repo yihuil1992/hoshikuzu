@@ -83,7 +83,7 @@ export function ExpCalculatorChart({ data }: ExpCalculatorChartProps) {
         </ChartContainer>
 
         {/* Hover 対応の stats セクション */}
-        <div className="mt-4 border border-white/12 bg-white/[0.03] px-3 py-2 text-xs sm:text-sm">
+        <div className="mt-4 border border-border bg-secondary/35 px-3 py-2 text-xs sm:text-sm">
           {current ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>

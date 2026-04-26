@@ -12,17 +12,17 @@ export default function TermsOfService() {
             Document
           </div>
           <CardTitle className="flex items-center gap-2 text-2xl font-light tracking-normal text-foreground">
-            <ShieldCheckIcon className="h-5 w-5 text-[#aad7dc]" />
+            <ShieldCheckIcon className="h-5 w-5 text-accent" />
             Terms of Service
           </CardTitle>
-          <CardDescription className="text-[#c7d0dd]">
+          <CardDescription className="text-muted-foreground">
             Please review the following terms before using Hoshikuzu Starfield.
           </CardDescription>
         </CardHeader>
 
         <Separator className="mx-6" />
 
-        <CardContent className="max-w-none space-y-4 py-6 text-sm leading-6 text-[#c7d0dd]">
+        <CardContent className="max-w-none space-y-4 py-6 text-sm leading-6 text-muted-foreground">
           <p>
             By using <strong>Hoshikuzu Starfield</strong>, you agree to use this experience for
             personal and non-commercial purposes only. All visual and interactive content is

@@ -29,7 +29,7 @@ export function LevelPenaltyChartCard() {
             alt="level gap"
             width={900}
             height={650}
-            className="max-h-48 w-auto cursor-zoom-in border border-white/10 object-contain"
+            className="max-h-48 w-auto cursor-zoom-in border border-border object-contain"
           />
         </Zoom>
 

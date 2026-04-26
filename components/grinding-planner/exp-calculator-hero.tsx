@@ -14,8 +14,8 @@ export function ExpCalculatorHero() {
         transition={{ duration: 0.5 }}
         className="mx-auto max-w-5xl"
       >
-        <div className="inline-flex items-center gap-2 border border-white/14 bg-white/[0.03] px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          <LineChart className="h-4 w-4 text-[#aad7dc]" />
+        <div className="inline-flex items-center gap-2 border border-border bg-card/45 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <LineChart className="h-4 w-4 text-accent" />
           EXP カリキュレーター
         </div>
 

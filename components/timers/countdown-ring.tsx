@@ -17,8 +17,8 @@ export default function CountdownRing({
   size = 128,
   thickness = 8,
   label,
-  colorClass = 'stroke-[#aad7dc]',
-  bgClass = 'stroke-white/10',
+  colorClass = 'stroke-accent',
+  bgClass = 'stroke-muted',
   transitionMs = 250,
 }: Props) {
   const r = (size - thickness) / 2;

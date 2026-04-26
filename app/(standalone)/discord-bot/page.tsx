@@ -38,11 +38,11 @@ function CommandRow({ cmd, desc, example }: { cmd: string; desc: string; example
   const [copied, setCopied] = useState(false);
 
   return (
-    <div className="flex flex-col gap-2 border border-white/12 bg-white/[0.03] p-4">
+    <div className="flex flex-col gap-2 border border-border bg-secondary/35 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <code className="rounded-[2px] border border-white/12 bg-background px-2 py-1 text-sm text-foreground">
+            <code className="rounded-[2px] border border-border bg-background px-2 py-1 text-sm text-foreground">
               {cmd}
             </code>
             <span className="text-sm text-muted-foreground">{desc}</span>
@@ -82,14 +82,14 @@ function CommandRow({ cmd, desc, example }: { cmd: string; desc: string; example
 
 function BotCover({ title }: { title: string }) {
   return (
-    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2px] border border-white/14 bg-background">
+    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2px] border border-border bg-background">
       <div
         aria-hidden
         className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:72px_72px]"
       />
-      <div className="absolute inset-x-0 top-0 flex h-10 items-center justify-between border-b border-white/10 px-4">
+      <div className="absolute inset-x-0 top-0 flex h-10 items-center justify-between border-b border-border px-4">
         <div className="inline-flex items-center gap-2 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          <Sparkles className="size-4 text-[#aad7dc]" />
+          <Sparkles className="size-4 text-accent" />
           {title}
         </div>
         <div className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -101,10 +101,10 @@ function BotCover({ title }: { title: string }) {
           {['guild watch', 'rank channel', 'history trace'].map((label, index) => (
             <div
               key={label}
-              className="flex items-center justify-between border border-white/12 bg-white/[0.035] px-4 py-3"
+              className="flex items-center justify-between border border-border bg-card/55 px-4 py-3"
             >
               <div className="flex items-center gap-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#aad7dc]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                 <span className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   {label}
                 </span>
@@ -190,7 +190,7 @@ export default function BotPage() {
   );
 
   return (
-    <div className="min-h-dvh">
+    <div lang="ja" className="min-h-dvh">
       <section className="relative px-2 pt-16 pb-8 sm:px-4">
         <MotionDiv
           initial={{ opacity: 0, y: 10 }}
@@ -200,14 +200,14 @@ export default function BotPage() {
           className="mx-auto max-w-6xl"
         >
           <div className="mx-auto max-w-3xl text-center">
-            <div className="inline-flex items-center gap-2 border border-white/14 bg-white/[0.03] px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              <Sparkles className="size-4 text-[#aad7dc]" />
+            <div className="inline-flex items-center gap-2 border border-border bg-card/45 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Sparkles className="size-4 text-accent" />
               Discord Signal
             </div>
             <h1 className="mt-5 text-4xl font-light leading-none text-foreground sm:text-5xl">
               {BOT_NAME}
             </h1>
-            <p className="mt-4 text-balance text-sm leading-6 text-[#c7d0dd]">
+            <p className="mt-4 text-balance text-sm leading-6 text-muted-foreground">
               {BOT_TAGLINE}
             </p>
 
@@ -255,11 +255,11 @@ export default function BotPage() {
             transition={{ duration: 0.45 }}
             className="mx-auto max-w-3xl"
           >
-            <div className="inline-flex items-center gap-2 border border-white/14 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              <Bot className="size-4 text-[#aad7dc]" />
+            <div className="inline-flex items-center gap-2 border border-border px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Bot className="size-4 text-accent" />
               概要
             </div>
-            <h2 className="mt-4 text-2xl font-light sm:text-3xl">できること</h2>
+            <h2 className="mt-4 text-2xl font-normal sm:text-3xl">できること</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Flyff のランキングを定期的にチェックし、
               <strong>ギルド所属変動</strong>を検知して通知します。
@@ -281,7 +281,7 @@ export default function BotPage() {
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center gap-3 normal-case tracking-normal">
-                        <span className="grid size-9 place-items-center border border-white/14 bg-background">
+                        <span className="grid size-9 place-items-center border border-border bg-background">
                           <Icon className="size-5" />
                         </span>
                         {f.title}
@@ -320,11 +320,11 @@ export default function BotPage() {
             transition={{ duration: 0.45 }}
             className="mx-auto max-w-3xl"
           >
-            <div className="inline-flex items-center gap-2 border border-white/14 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              <Command className="size-4 text-[#aad7dc]" />
+            <div className="inline-flex items-center gap-2 border border-border px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Command className="size-4 text-accent" />
               コマンド
             </div>
-            <h2 className="mt-4 text-2xl font-light sm:text-3xl">
+            <h2 className="mt-4 text-2xl font-normal sm:text-3xl">
               使い方（代表例）
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -346,7 +346,7 @@ export default function BotPage() {
                   <Card className="overflow-hidden">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 normal-case tracking-normal">
-                        <Icon className="size-5 text-[#aad7dc]" /> {c.group}
+                        <Icon className="size-5 text-accent" /> {c.group}
                       </CardTitle>
                       <CardDescription>
                         コピーアイコンでコマンドをワンクリックコピーできます。
@@ -375,7 +375,7 @@ export default function BotPage() {
       </section>
 
       <section className="px-2 pb-16 sm:px-4">
-        <div className="mx-auto max-w-6xl border border-white/14 bg-card/70 p-6 text-center text-sm leading-6 text-muted-foreground">
+        <div className="mx-auto max-w-6xl border border-border bg-card/70 p-6 text-center text-sm leading-6 text-muted-foreground">
           <div className="mx-auto max-w-3xl">
             <span className="font-medium text-foreground">{BOT_NAME}</span>{' '}
             は特定サーバー向けに調整される場合があります。機能・コマンドは予告なく追加・変更されることがあります。

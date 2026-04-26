@@ -42,12 +42,12 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
 
     if (levelChanged) {
       isAltGroup = !isAltGroup;
-      const groupHeaderBg = isAltGroup ? 'bg-white/[0.07]' : 'bg-white/[0.04]';
+      const groupHeaderBg = isAltGroup ? 'bg-secondary/70' : 'bg-secondary/45';
 
       bodyRows.push(
         <TableRow
           key={`group-${row.playerLevel}`}
-          className={`${groupHeaderBg} border-t border-white/12`}
+          className={`${groupHeaderBg} border-t border-border`}
         >
           <TableCell
             colSpan={HEADER_COLS.length}
@@ -61,7 +61,7 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
       lastLevel = row.playerLevel;
     }
 
-    const groupRowBg = isAltGroup ? 'bg-white/[0.025]' : '';
+    const groupRowBg = isAltGroup ? 'bg-secondary/25' : '';
 
     bodyRows.push(
       <TableRow

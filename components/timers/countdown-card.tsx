@@ -42,7 +42,7 @@ export default function CountdownCard({
   const pct = Math.max(0, Math.min(100, (seconds / Math.max(1, cycleStart)) * 100));
 
   return (
-    <div className="mx-auto w-full border border-white/14 bg-card/80 p-5">
+    <div className="mx-auto w-full border border-border bg-card/80 p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           {title}

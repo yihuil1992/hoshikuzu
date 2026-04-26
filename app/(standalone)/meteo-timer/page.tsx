@@ -41,13 +41,13 @@ export default function MeteoTimerPage() {
       <section>
         <div className="flex items-center gap-3 text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           <span>Meteo Timer</span>
-          <span className="h-px flex-1 bg-white/14" />
+          <span className="h-px flex-1 bg-border" />
           <span>2 instruments</span>
         </div>
         <h1 className="mt-5 text-4xl font-light leading-none text-foreground sm:text-5xl">
           Meteo Timer
         </h1>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#c7d0dd]">
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
           Two compact countdown instruments for repeated timing. Controls stay visible and quiet so
           the rhythm is easy to read at a glance.
         </p>
