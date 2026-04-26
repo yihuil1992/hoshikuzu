@@ -8,6 +8,8 @@ import {
   Wrench,
 } from 'lucide-react';
 
+import type { CSSProperties } from 'react';
+
 const sections = [
   {
     id: '01',
@@ -113,7 +115,7 @@ export default function TermsOfService() {
           <ol className="space-y-3">
             {sections.map((section) => (
               <li key={section.id}>
-                <a className="transition-colors hover:text-foreground" href={`#terms-${section.id}`}>
+                <a className="atlas-motion-link hover:text-foreground" href={`#terms-${section.id}`}>
                   {section.id} {section.title}
                 </a>
               </li>
@@ -129,7 +131,8 @@ export default function TermsOfService() {
               <section
                 key={section.id}
                 id={`terms-${section.id}`}
-                className="border border-border bg-card/70 p-5 sm:p-6"
+                className="atlas-document-section border border-border bg-card/70 p-5 sm:p-6"
+                style={{ '--atlas-delay': `${Number(section.id) * 45}ms` } as CSSProperties}
               >
                 <div className="flex items-start gap-4">
                   <div className="grid size-10 shrink-0 place-items-center border border-border bg-background/70 text-accent">

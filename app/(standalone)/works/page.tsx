@@ -62,13 +62,13 @@ function SitePreview({
           fill
           sizes="(min-width: 768px) 50vw, 100vw"
           className={cn(
-            'object-cover object-top transition duration-500 group-hover:opacity-100 group-hover:saturate-100',
+            'object-cover object-top transition-[opacity,filter] duration-300 ease-[var(--ease-out-quint)] group-hover:opacity-100 group-hover:saturate-100',
             mode === 'archive' ? 'opacity-95 saturate-[0.9]' : 'opacity-85 saturate-[0.86]',
           )}
         />
         <div
           className={cn(
-            'pointer-events-none absolute inset-0',
+            'pointer-events-none absolute inset-0 transition-opacity duration-300 ease-[var(--ease-out-quint)] group-hover:opacity-70',
             mode === 'archive'
               ? 'bg-[linear-gradient(to_bottom,rgba(247,248,243,0.02),rgba(247,248,243,0.22))]'
               : 'bg-[linear-gradient(to_bottom,rgba(2,4,10,0.08),rgba(2,4,10,0.28))]',

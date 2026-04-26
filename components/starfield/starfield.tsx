@@ -349,7 +349,7 @@ export default function StarField() {
                   <div
                     onPointerDown={(e) => e.stopPropagation()}
                     className={cn(
-                      'relative translate-x-12 translate-y-8 select-none border px-4 py-3 shadow-lg backdrop-blur-md',
+                      'atlas-panel-enter relative translate-x-12 translate-y-8 select-none border px-4 py-3 shadow-lg backdrop-blur-md',
                       isArchive
                         ? 'border-[rgba(36,48,64,0.18)] bg-[rgba(255,255,252,0.82)] text-[#172033] supports-[backdrop-filter]:bg-[rgba(255,255,252,0.74)]'
                         : 'border-white/14 bg-[#05070d]/76 text-white supports-[backdrop-filter]:bg-[#05070d]/64',

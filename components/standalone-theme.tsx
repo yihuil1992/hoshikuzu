@@ -14,9 +14,10 @@ type StandaloneThemeContextValue = {
 
 const StandaloneThemeContext = createContext<StandaloneThemeContextValue | null>(null);
 const STORAGE_KEY = 'hoshikuzu-standalone-mode';
+const DEFAULT_MODE: StandaloneMode = 'night';
 
 export function StandaloneThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<StandaloneMode>('night');
+  const [mode, setMode] = useState<StandaloneMode>(DEFAULT_MODE);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
