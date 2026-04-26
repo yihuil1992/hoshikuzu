@@ -42,12 +42,12 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
 
     if (levelChanged) {
       isAltGroup = !isAltGroup;
-      const groupHeaderBg = isAltGroup ? 'bg-muted/70' : 'bg-muted/40';
+      const groupHeaderBg = isAltGroup ? 'bg-secondary/70' : 'bg-secondary/45';
 
       bodyRows.push(
         <TableRow
           key={`group-${row.playerLevel}`}
-          className={`${groupHeaderBg} hover:${groupHeaderBg} border-t`}
+          className={`${groupHeaderBg} border-t border-border`}
         >
           <TableCell
             colSpan={HEADER_COLS.length}
@@ -61,12 +61,12 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
       lastLevel = row.playerLevel;
     }
 
-    const groupRowBg = isAltGroup ? 'bg-muted/10' : '';
+    const groupRowBg = isAltGroup ? 'bg-secondary/25' : '';
 
     bodyRows.push(
       <TableRow
         key={`${row.playerLevel}-${row.rank}-${row.id}`}
-        className={`hover:bg-muted/40 ${groupRowBg} ${row.rank === 1 ? 'bg-primary/5' : ''}`}
+        className={`${groupRowBg} ${row.rank === 1 ? 'bg-primary/10 text-foreground' : ''}`}
       >
         {/* Level 列隐藏文本但保留宽度 */}
         <TableCell className="text-xs text-transparent select-none">{row.playerLevel}</TableCell>
@@ -108,7 +108,7 @@ export function ExpCalculatorTable({ rows }: ExpCalculatorTableProps) {
   }
 
   return (
-    <Card className="mx-auto max-w-5xl border-muted/60">
+    <Card className="mx-auto max-w-5xl">
       <CardHeader>
         <CardTitle>レベル帯ごとのおすすめ狩場</CardTitle>
         <CardDescription>

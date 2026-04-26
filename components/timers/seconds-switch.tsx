@@ -1,5 +1,7 @@
 'use client';
+
 import * as React from 'react';
+
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
@@ -13,13 +15,15 @@ export default function SecondsSwitch({
   const checked = !isThirty; // 右 = 32秒
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm text-muted-foreground">今は</span>
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <span className="text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        今は
+      </span>
 
       <span
         className={cn(
-          'rounded-full px-2 py-0.5 text-sm transition-colors',
-          isThirty ? 'bg-primary/10 text-primary' : 'text-muted-foreground',
+          'border px-2 py-0.5 text-xs transition-colors',
+          isThirty ? 'border-primary/40 bg-primary/10 text-primary' : 'border-transparent text-muted-foreground',
         )}
       >
         30秒
@@ -29,19 +33,20 @@ export default function SecondsSwitch({
         checked={checked}
         onCheckedChange={() => onToggle()}
         aria-label="switch 30/32 seconds"
-        className="data-[state=checked]:bg-primary"
       />
 
       <span
         className={cn(
-          'rounded-full px-2 py-0.5 text-sm transition-colors',
-          !isThirty ? 'bg-primary/10 text-primary' : 'text-muted-foreground',
+          'border px-2 py-0.5 text-xs transition-colors',
+          !isThirty ? 'border-primary/40 bg-primary/10 text-primary' : 'border-transparent text-muted-foreground',
         )}
       >
         32秒
       </span>
 
-      <span className="text-sm text-muted-foreground">から</span>
+      <span className="text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        から
+      </span>
     </div>
   );
 }

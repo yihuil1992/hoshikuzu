@@ -18,6 +18,8 @@ export type StarProps = {
   name: string;
   isActive: boolean;
   distanceScale: number;
+  themeMode?: 'archive' | 'night';
+  suppressHoverLabel?: boolean;
   prominence?: number;
   densityScale?: number;
   worldPositionRef?: MutableRefObject<THREE.Vector3>;
@@ -37,6 +39,8 @@ export function Star({
   name,
   isActive,
   distanceScale,
+  themeMode = 'night',
+  suppressHoverLabel = false,
   prominence = 1,
   densityScale = 1,
   worldPositionRef,
@@ -70,43 +74,56 @@ export function Star({
     [index, prominence],
   );
   const hueJitter = useMemo(() => (seededUnit(index, 4) - 0.5) * 0.1, [index]);
+  const isArchive = themeMode === 'archive';
   const baseColor = useMemo(() => new THREE.Color(color), [color]);
 
-  // 颜色：轻微偏白提亮，避免“灰”
+  // 颜色：夜间发光，纸张版则像印在星图纸上的墨色信号。
   const brightColor = useMemo(
-    () =>
-      baseColor
+    () => {
+      if (isArchive) {
+        return baseColor
+          .clone()
+          .offsetHSL(hueJitter * 0.7, -0.18, -0.08)
+          .lerp(new THREE.Color('#477c86'), 0.4)
+          .lerp(new THREE.Color('#172033'), 0.18);
+      }
+      return baseColor
         .clone()
         .offsetHSL(hueJitter * 1.2, 0, 0.18)
-        .lerp(new THREE.Color('#fff'), 0.22),
-    [baseColor, hueJitter],
+        .lerp(new THREE.Color('#fff'), 0.22);
+    },
+    [baseColor, hueJitter, isArchive],
   );
 
   const innerMat = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
         map: coreTexture,
-        color: brightColor.clone().lerp(new THREE.Color('#fff'), 0.48),
+        color: isArchive
+          ? brightColor.clone().lerp(new THREE.Color('#172033'), 0.34)
+          : brightColor.clone().lerp(new THREE.Color('#fff'), 0.48),
         transparent: true,
-        opacity: 0.34,
-        blending: THREE.AdditiveBlending,
+        opacity: isArchive ? 0.24 : 0.34,
+        blending: isArchive ? THREE.NormalBlending : THREE.AdditiveBlending,
         depthWrite: false,
         depthTest: false,
       }),
-    [brightColor, coreTexture],
+    [brightColor, coreTexture, isArchive],
   );
   const glintMat = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
         map: glintTexture,
-        color: new THREE.Color('#f7fbff'),
+        color: isArchive
+          ? brightColor.clone().lerp(new THREE.Color('#172033'), 0.22)
+          : new THREE.Color('#f7fbff'),
         transparent: true,
-        opacity: 0.34,
-        blending: THREE.AdditiveBlending,
+        opacity: isArchive ? 0.16 : 0.34,
+        blending: isArchive ? THREE.NormalBlending : THREE.AdditiveBlending,
         depthWrite: false,
         depthTest: false,
       }),
-    [glintTexture],
+    [brightColor, glintTexture, isArchive],
   );
   const coreMat = useMemo(
     () => {
@@ -116,6 +133,7 @@ export function Star({
         uTime: { value: 0 },
         uHover: { value: 0 },
         uSeed: { value: index * 17.17 },
+        uArchive: { value: isArchive ? 1 : 0 },
       };
 
       return new THREE.ShaderMaterial({
@@ -134,6 +152,7 @@ export function Star({
           uniform float uTime;
           uniform float uHover;
           uniform float uSeed;
+          uniform float uArchive;
           varying vec2 vUv;
 
           float hash(vec2 p) {
@@ -159,16 +178,33 @@ export function Star({
 
             vec3 hot = mix(uColor, vec3(1.0), 0.52 + core * 0.34);
             vec3 fringe = mix(hot, vec3(0.72, 0.9, 1.0), smoothstep(0.1, 0.42, radius) * 0.18);
+
+            if (uArchive > 0.5) {
+              float printedDisk = 1.0 - smoothstep(0.36, 0.43, radius);
+              float rim = smoothstep(0.29, 0.35, radius) * (1.0 - smoothstep(0.39, 0.46, radius));
+              float centerInk = 1.0 - smoothstep(0.1, 0.22, radius);
+              float paperTooth = 0.94 + (grain - 0.5) * 0.08;
+              vec3 paperNormal = normalize(vec3(centered.x * 2.0, centered.y * 2.0, sqrt(max(0.0, 1.0 - radius * radius * 5.8))));
+              float volumeLight = dot(paperNormal, normalize(vec3(-0.42, 0.58, 0.7)));
+              float highlight = smoothstep(0.62, 0.98, volumeLight) * printedDisk;
+              float formShadow = smoothstep(-0.62, -0.08, -volumeLight) * printedDisk;
+              float castShadow = smoothstep(0.12, 0.44, radius) * smoothstep(0.18, -0.18, centered.x + centered.y * 0.36);
+
+              hot = mix(uColor, vec3(0.09, 0.13, 0.2), centerInk * 0.16 + rim * 0.1);
+              fringe = hot * (1.0 + highlight * 0.16 - formShadow * 0.18 - castShadow * 0.08);
+              fringe = mix(fringe, hot * 0.78, rim * 0.24 + centerInk * 0.06);
+              alpha = (printedDisk * 0.68 + rim * 0.18 + centerInk * 0.08) * paperTooth;
+            }
             gl_FragColor = vec4(fringe, alpha);
           }
         `,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        blending: isArchive ? THREE.NormalBlending : THREE.AdditiveBlending,
         depthWrite: false,
         depthTest: false,
       });
     },
-    [brightColor, coreTexture, index],
+    [brightColor, coreTexture, index, isArchive],
   );
   const hitMat = useMemo(
     () =>
@@ -191,30 +227,34 @@ export function Star({
     );
     const enlarged = 1 + hoverMix.current * 0.42;
     const pulse = 0.6 + 0.4 * Math.sin(t * twinkleSpeed + phase);
-    const scale = baseScale * densityScale * distanceScale * (0.85 + 0.15 * pulse) * enlarged;
+    const modeScale = isArchive ? 1.08 : 1;
+    const scale =
+      baseScale * densityScale * distanceScale * modeScale * (0.85 + 0.15 * pulse) * enlarged;
 
     // 尺寸阻尼：内核更小更亮，外圈更大更淡
     if (innerRef.current) {
       const s = innerRef.current.scale.x || 1;
-      const target = scale * 1.12;
+      const target = scale * (isArchive ? 0.14 : 1.12);
       const next = THREE.MathUtils.damp(s, target, 6, dt);
       innerRef.current.scale.set(next, next, next);
       const innerMaterial = innerRef.current.material as THREE.MeshBasicMaterial;
-      innerMaterial.opacity = 0.32 * distanceScale * (0.9 + 0.1 * pulse);
+      innerMaterial.opacity = (isArchive ? 0.1 : 0.32) * distanceScale * (0.9 + 0.1 * pulse);
     }
     if (coreRef.current) {
-      const target = scale * 1.08 * (0.94 + 0.06 * pulse);
+      const target = scale * (isArchive ? 0.5 : 1.08) * (0.94 + 0.06 * pulse);
       coreRef.current.scale.set(target, target, target);
       const coreMaterial = coreRef.current.material as THREE.ShaderMaterial;
       coreMaterial.uniforms.uTime.value = t;
       coreMaterial.uniforms.uHover.value = hoverMix.current;
     }
     if (glintRef.current) {
-      const target = scale * 0.72 * (0.96 + hoverMix.current * 0.18);
+      const target = scale * (isArchive ? 0.16 : 0.72) * (0.96 + hoverMix.current * 0.18);
       glintRef.current.scale.set(target, target, target);
       glintRef.current.rotation.z = -t * 0.055 + phase * 0.6;
       const glintMaterial = glintRef.current.material as THREE.MeshBasicMaterial;
-      glintMaterial.opacity = 0.18 + hoverMix.current * 0.2;
+      glintMaterial.opacity = isArchive
+        ? 0.025 + hoverMix.current * 0.045
+        : 0.18 + hoverMix.current * 0.2;
     }
     if (hitRef.current) {
       const target = scale * 0.48;
@@ -274,7 +314,7 @@ export function Star({
         </mesh>
       </Billboard>
 
-      {hovered && !isActive && (
+      {hovered && !isActive && !suppressHoverLabel && (
         <Html
           distanceFactor={12}
           style={{ pointerEvents: 'none' }}
@@ -282,10 +322,14 @@ export function Star({
           zIndexRange={[1, 0]} // ★ 低
         >
           <div
-            className="border border-white/15 bg-[#05070d]/55 px-3 py-1.5 text-center text-[11px] font-medium uppercase text-white/85 shadow-[0_0_18px_rgba(180,220,255,0.16)] backdrop-blur-sm"
+            className={
+              isArchive
+                ? 'border border-[rgba(36,48,64,0.18)] bg-[rgba(255,255,252,0.72)] px-3 py-1.5 text-center text-[11px] font-medium uppercase text-[#172033]/85 shadow-[0_8px_24px_rgba(36,48,64,0.08)] backdrop-blur-sm'
+                : 'border border-white/15 bg-[#05070d]/55 px-3 py-1.5 text-center text-[11px] font-medium uppercase text-white/85 shadow-[0_0_18px_rgba(180,220,255,0.16)] backdrop-blur-sm'
+            }
             style={{
               letterSpacing: '0.16em',
-              textShadow: '0 0 10px rgba(210,235,255,0.5)',
+              textShadow: isArchive ? 'none' : '0 0 10px rgba(210,235,255,0.5)',
             }}
           >
             {name}

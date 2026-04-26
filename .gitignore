@@ -21,6 +21,9 @@
 .DS_Store
 *.pem
 /tmp/
+AGENT.md
+AGENTS.md
+CLAUDE.md
 
 # debug
 npm-debug.log*

@@ -9,11 +9,13 @@ import { useRouter } from 'next/navigation';
 import { Suspense, useMemo, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 
+import { useStandaloneTheme } from '@/components/standalone-theme';
 import { Button } from '@/components/ui/button';
 import { presetStars } from '@/constants/star-presets';
 import {
   computeSafeRadius,
 } from '@/lib/helpers';
+import { cn } from '@/lib/utils';
 
 import CameraFocus, { CameraPhase } from './camera-focus'; // ★ 引入独立组件
 import { RotatingGroup } from './rotating-group';
@@ -21,8 +23,118 @@ import { Star } from './star';
 
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
+function ArchiveChartBackdrop() {
+  const latitudeGeometry = useMemo(() => {
+    const positions: number[] = [];
+    const radius = 22;
+    const segments = 144;
+    const latitudes = [-60, -45, -30, -15, 0, 15, 30, 45, 60];
+
+    for (const latitude of latitudes) {
+      const phi = THREE.MathUtils.degToRad(latitude);
+      const y = Math.sin(phi) * radius;
+      const ringRadius = Math.cos(phi) * radius;
+
+      for (let i = 0; i < segments; i += 1) {
+        const a = (i / segments) * Math.PI * 2;
+        const b = ((i + 1) / segments) * Math.PI * 2;
+        positions.push(Math.cos(a) * ringRadius, y, Math.sin(a) * ringRadius);
+        positions.push(Math.cos(b) * ringRadius, y, Math.sin(b) * ringRadius);
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    return geometry;
+  }, []);
+
+  const longitudeGeometry = useMemo(() => {
+    const positions: number[] = [];
+    const radius = 22;
+    const segments = 144;
+    const longitudes = Array.from({ length: 12 }, (_, index) => index * 15);
+
+    for (const longitude of longitudes) {
+      const theta = THREE.MathUtils.degToRad(longitude);
+      const cosTheta = Math.cos(theta);
+      const sinTheta = Math.sin(theta);
+
+      for (let i = 0; i < segments; i += 1) {
+        const a = (i / segments) * Math.PI * 2;
+        const b = ((i + 1) / segments) * Math.PI * 2;
+        const r1 = Math.cos(a) * radius;
+        const r2 = Math.cos(b) * radius;
+        positions.push(r1 * cosTheta, Math.sin(a) * radius, r1 * sinTheta);
+        positions.push(r2 * cosTheta, Math.sin(b) * radius, r2 * sinTheta);
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    return geometry;
+  }, []);
+
+  const dotGeometry = useMemo(() => {
+    const positions: number[] = [];
+    const radius = 21.8;
+    const latitudes = [-30, 0, 30];
+    const longitudes = Array.from({ length: 14 }, (_, index) => index * (360 / 14));
+
+    for (const latitude of latitudes) {
+      const phi = THREE.MathUtils.degToRad(latitude);
+      const y = Math.sin(phi) * radius;
+      const ringRadius = Math.cos(phi) * radius;
+
+      for (const longitude of longitudes) {
+        const theta = THREE.MathUtils.degToRad(longitude);
+        positions.push(Math.cos(theta) * ringRadius, y, Math.sin(theta) * ringRadius);
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    return geometry;
+  }, []);
+
+  return (
+    <group renderOrder={-10} rotation={[0.52, -0.62, 0.28]}>
+      <lineSegments geometry={latitudeGeometry}>
+        <lineBasicMaterial
+          color="#243040"
+          transparent
+          opacity={0.072}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </lineSegments>
+      <lineSegments geometry={longitudeGeometry}>
+        <lineBasicMaterial
+          color="#243040"
+          transparent
+          opacity={0.086}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </lineSegments>
+      <points geometry={dotGeometry}>
+        <pointsMaterial
+          color="#243040"
+          transparent
+          opacity={0.28}
+          size={0.035}
+          sizeAttenuation
+          depthWrite={false}
+          depthTest
+        />
+      </points>
+    </group>
+  );
+}
+
 export default function StarField() {
   const router = useRouter();
+  const { mode, toggleMode } = useStandaloneTheme();
+  const isArchive = mode === 'archive';
   const controlsRef = useRef<OrbitControlsImpl>(null);
 
   const [aspect, setAspect] = useState(16 / 9);
@@ -118,10 +230,39 @@ export default function StarField() {
     setFocusTarget(null);
   };
 
+  const scene = isArchive
+    ? {
+        background: '#f7f8f3',
+        foreground: '#172033',
+        muted: '#66727f',
+        faint: 'rgba(23, 32, 51, 0.18)',
+        panel: 'rgba(255, 255, 252, 0.78)',
+        line: 'rgba(36, 48, 64, 0.18)',
+        accent: '#477c86',
+        primary: '#172033',
+        primaryText: '#f7f8f3',
+      }
+    : {
+        background: '#02040a',
+        foreground: '#f8fafc',
+        muted: 'rgba(255, 255, 255, 0.64)',
+        faint: 'rgba(255, 255, 255, 0.18)',
+        panel: 'rgba(5, 7, 13, 0.76)',
+        line: 'rgba(255, 255, 255, 0.14)',
+        accent: '#aad7dc',
+        primary: '#f5f0dc',
+        primaryText: '#02040a',
+      };
+
   return (
     <>
       {/* 3D 背景层 */}
-      <div className="fixed inset-0 z-0 bg-[#02040a]">
+      <div
+        className={cn(
+          'fixed inset-0 z-0 transition-colors duration-300',
+          isArchive ? 'bg-[#f7f8f3]' : 'bg-[#02040a]',
+        )}
+      >
         <Canvas
           className="absolute inset-0"
           gl={{ alpha: false }}
@@ -130,12 +271,12 @@ export default function StarField() {
             if (open) handleClose();
           }}
         >
-          <color attach="background" args={['#02040a']} />
-          <fog attach="fog" args={['#02040a', 12, 42]} />
+          <color attach="background" args={[scene.background]} />
+          <fog attach="fog" args={[scene.background, isArchive ? 18 : 12, isArchive ? 60 : 42]} />
 
-          <ambientLight intensity={0.42} />
-          <pointLight position={[-7, 6, 8]} intensity={1.3} color="#f5f0dc" />
-          <pointLight position={[6, -4, 5]} intensity={0.55} color="#9ad7d8" />
+          <ambientLight intensity={isArchive ? 0.72 : 0.42} />
+          <pointLight position={[-7, 6, 8]} intensity={isArchive ? 0.65 : 1.3} color="#f5f0dc" />
+          <pointLight position={[6, -4, 5]} intensity={isArchive ? 0.28 : 0.55} color="#9ad7d8" />
 
           <OrbitControls
             ref={controlsRef}
@@ -156,8 +297,21 @@ export default function StarField() {
             onPhaseChange={setPhase} // ★ 回调阶段
           />
 
-          <Stars radius={76} depth={64} count={5600} factor={3.1} fade speed={0.55} />
-          <Sparkles size={1.4} speed={0.18} count={34} scale={28} opacity={0.24} color="#b9e4ee" />
+          {isArchive ? (
+            <ArchiveChartBackdrop />
+          ) : (
+            <>
+              <Stars radius={76} depth={64} count={5600} factor={3.1} fade speed={0.55} />
+              <Sparkles
+                size={1.4}
+                speed={0.18}
+                count={34}
+                scale={28}
+                opacity={0.24}
+                color="#b9e4ee"
+              />
+            </>
+          )}
 
           <Suspense fallback={null}>
             {/* 聚焦时暂停整体自转 */}
@@ -176,6 +330,8 @@ export default function StarField() {
                   prominence={star.prominence}
                   densityScale={starDensityScale}
                   worldPositionRef={starWorldPositionRefs[i]}
+                  themeMode={mode}
+                  suppressHoverLabel={open}
                 />
               ))}
 
@@ -192,33 +348,63 @@ export default function StarField() {
                 >
                   <div
                     onPointerDown={(e) => e.stopPropagation()}
-                    className="relative translate-x-12 translate-y-8 select-none border border-white/14 bg-[#05070d]/76 px-4 py-3 text-white shadow-lg backdrop-blur-md supports-[backdrop-filter]:bg-[#05070d]/64"
+                    className={cn(
+                      'atlas-panel-enter relative translate-x-12 translate-y-8 select-none border px-4 py-3 shadow-lg backdrop-blur-md',
+                      isArchive
+                        ? 'border-[rgba(36,48,64,0.18)] bg-[rgba(255,255,252,0.82)] text-[#172033] supports-[backdrop-filter]:bg-[rgba(255,255,252,0.74)]'
+                        : 'border-white/14 bg-[#05070d]/76 text-white supports-[backdrop-filter]:bg-[#05070d]/64',
+                    )}
                     style={{
                       minWidth: 260,
                       maxWidth: 340,
-                      boxShadow: '0 22px 70px rgba(0,0,0,0.54), 0 0 34px rgba(170,215,220,0.12)',
+                      boxShadow: isArchive
+                        ? '0 18px 46px rgba(36,48,64,0.12)'
+                        : '0 22px 70px rgba(0,0,0,0.54), 0 0 34px rgba(170,215,220,0.12)',
                     }}
                   >
-                    <div className="pointer-events-none absolute -left-10 top-1/2 hidden h-px w-10 bg-gradient-to-l from-white/34 to-transparent sm:block" />
-                    <div className="pointer-events-none absolute -left-12 top-1/2 hidden size-1 -translate-y-1/2 rounded-full bg-white/55 shadow-[0_0_12px_rgba(220,240,255,0.8)] sm:block" />
+                    <div
+                      className={cn(
+                        'pointer-events-none absolute -left-10 top-1/2 hidden h-px w-10 bg-gradient-to-l to-transparent sm:block',
+                        isArchive ? 'from-[rgba(36,48,64,0.34)]' : 'from-white/34',
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        'pointer-events-none absolute -left-12 top-1/2 hidden size-1 -translate-y-1/2 rounded-full sm:block',
+                        isArchive
+                          ? 'bg-[#477c86]/65 shadow-[0_0_8px_rgba(71,124,134,0.24)]'
+                          : 'bg-white/55 shadow-[0_0_12px_rgba(220,240,255,0.8)]',
+                      )}
+                    />
 
                     <div className="mb-3 flex items-start justify-between gap-4">
                       <div>
                         <div
-                          className="text-[10px] font-semibold uppercase text-white/42"
+                          className={cn(
+                            'text-[10px] font-semibold uppercase',
+                            isArchive ? 'text-[#66727f]' : 'text-white/42',
+                          )}
                           style={{ letterSpacing: '0.22em' }}
                         >
                           signal {String((selectedIndex ?? 0) + 1).padStart(2, '0')}
                         </div>
                         <div
-                          className="mt-1 text-sm font-semibold uppercase text-white/92"
+                          className={cn(
+                            'mt-1 text-sm font-semibold uppercase',
+                            isArchive ? 'text-[#172033]' : 'text-white/92',
+                          )}
                           style={{ letterSpacing: '0.14em' }}
                         >
                           {selectedStar.name}
                         </div>
                       </div>
                       <button
-                        className="pointer-events-auto grid size-7 place-items-center border border-white/12 text-sm leading-none text-white/50 transition-colors hover:border-white/24 hover:text-white/88"
+                        className={cn(
+                          'pointer-events-auto grid size-7 place-items-center border text-sm leading-none transition-colors',
+                          isArchive
+                            ? 'border-[rgba(36,48,64,0.16)] text-[#66727f] hover:border-[rgba(36,48,64,0.28)] hover:text-[#172033]'
+                            : 'border-white/12 text-white/50 hover:border-white/24 hover:text-white/88',
+                        )}
                         type="button"
                         aria-label="Close star details"
                         onClick={(e) => {
@@ -230,17 +416,42 @@ export default function StarField() {
                       </button>
                     </div>
 
-                    <div className="mb-3 h-px bg-gradient-to-r from-white/18 via-white/8 to-transparent" />
+                    <div
+                      className={cn(
+                        'mb-3 h-px bg-gradient-to-r to-transparent',
+                        isArchive
+                          ? 'from-[rgba(36,48,64,0.18)] via-[rgba(36,48,64,0.08)]'
+                          : 'from-white/18 via-white/8',
+                      )}
+                    />
 
-                    <div className="text-xs leading-relaxed text-white/70">{selectedStar.description}</div>
+                    <div
+                      className={cn(
+                        'text-xs leading-relaxed',
+                        isArchive ? 'text-[#66727f]' : 'text-white/70',
+                      )}
+                    >
+                      {selectedStar.description}
+                    </div>
 
                     <div className="mt-4 flex items-center justify-between gap-3">
-                      <div className="text-[10px] uppercase text-white/34" style={{ letterSpacing: '0.18em' }}>
+                      <div
+                        className={cn(
+                          'text-[10px] uppercase',
+                          isArchive ? 'text-[#8a94a0]' : 'text-white/34',
+                        )}
+                        style={{ letterSpacing: '0.18em' }}
+                      >
                         mapped object
                       </div>
                       <Button
                         size="sm"
-                        className="h-7 border border-white/15 bg-white/90 px-3 text-[11px] uppercase text-[#05070d] hover:bg-white"
+                        className={cn(
+                          'h-7 px-3 text-[11px] uppercase',
+                          isArchive
+                            ? 'border border-[#172033] bg-[#172033] text-[#f7f8f3] hover:bg-[#172033]/90'
+                            : 'border border-white/15 bg-white/90 text-[#05070d] hover:bg-white',
+                        )}
                         style={{ letterSpacing: '0.12em' }}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -260,34 +471,79 @@ export default function StarField() {
 
       {/* 前景 UI 层（不挡拖拽；真正可点元素单独开 pointer-events） */}
       <div className="pointer-events-none fixed inset-0 z-10">
-        <section className="absolute left-6 top-6 max-w-[min(26rem,calc(100vw-3rem))] text-white sm:left-10 sm:top-9">
-          <div className="mb-4 h-px w-20 bg-gradient-to-r from-white/55 to-transparent" />
+        <section
+          className={cn(
+            'absolute left-6 top-6 max-w-[min(26rem,calc(100vw-3rem))] sm:left-10 sm:top-9',
+            isArchive ? 'text-[#172033]' : 'text-white',
+          )}
+        >
+          <div
+            className={cn(
+              'mb-4 h-px w-20 bg-gradient-to-r to-transparent',
+              isArchive ? 'from-[rgba(36,48,64,0.48)]' : 'from-white/55',
+            )}
+          />
           <p
-            className="mb-3 text-[10px] font-medium uppercase text-white/48"
+            className={cn(
+              'mb-3 text-[10px] font-medium uppercase',
+              isArchive ? 'text-[#66727f]' : 'text-white/48',
+            )}
             style={{ letterSpacing: '0.24em' }}
           >
             stardust index
           </p>
-          <h1 className="text-4xl font-light leading-none text-white/92 drop-shadow-[0_2px_18px_rgba(0,0,0,0.82)] sm:text-6xl">
+          <h1
+            className={cn(
+              'text-4xl font-light leading-none sm:text-6xl',
+              isArchive
+                ? 'text-[#172033]'
+                : 'text-white/92 drop-shadow-[0_2px_18px_rgba(0,0,0,0.82)]',
+            )}
+          >
             ほしくず
           </h1>
-          <p className="mt-4 max-w-72 text-sm leading-6 text-white/64 drop-shadow-[0_2px_14px_rgba(0,0,0,0.8)] sm:text-[15px]">
+          <p
+            className={cn(
+              'mt-4 max-w-72 text-sm leading-6 sm:text-[15px]',
+              isArchive
+                ? 'text-[#66727f]'
+                : 'text-white/64 drop-shadow-[0_2px_14px_rgba(0,0,0,0.8)]',
+            )}
+          >
             Quiet signals, small tools, and drifting experiments gathered into one night sky.
           </p>
         </section>
 
         <div className="absolute bottom-5 right-5 flex items-center gap-3 pointer-events-none sm:bottom-7 sm:right-7">
+          <button
+            type="button"
+            onClick={toggleMode}
+            className={cn(
+              'pointer-events-auto text-[11px] font-medium uppercase transition-colors',
+              isArchive ? 'text-[#66727f] hover:text-[#172033]' : 'text-white/48 hover:text-white/88',
+            )}
+            style={{ letterSpacing: '0.12em' }}
+          >
+            {isArchive ? 'Archive Sheet' : 'Night Atlas'}
+          </button>
+          <span className={isArchive ? 'text-[#8a94a0]' : 'text-white/18'}>/</span>
           <Link
             href="/privacy-policy"
-            className="pointer-events-auto text-[11px] font-medium uppercase text-white/48 transition-colors hover:text-white/88"
+            className={cn(
+              'pointer-events-auto text-[11px] font-medium uppercase transition-colors',
+              isArchive ? 'text-[#66727f] hover:text-[#172033]' : 'text-white/48 hover:text-white/88',
+            )}
             style={{ letterSpacing: '0.12em' }}
           >
             Privacy
           </Link>
-          <span className="text-white/18">/</span>
+          <span className={isArchive ? 'text-[#8a94a0]' : 'text-white/18'}>/</span>
           <Link
             href="/terms-of-service"
-            className="pointer-events-auto text-[11px] font-medium uppercase text-white/48 transition-colors hover:text-white/88"
+            className={cn(
+              'pointer-events-auto text-[11px] font-medium uppercase transition-colors',
+              isArchive ? 'text-[#66727f] hover:text-[#172033]' : 'text-white/48 hover:text-white/88',
+            )}
             style={{ letterSpacing: '0.12em' }}
           >
             Terms

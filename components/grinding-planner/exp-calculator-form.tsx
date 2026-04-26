@@ -152,10 +152,10 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
   };
 
   return (
-    <Card className="mx-auto max-w-5xl border-muted/60">
+    <Card className="mx-auto max-w-5xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <LineChartIcon className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 normal-case tracking-normal">
+          <LineChartIcon className="h-5 w-5 text-accent" />
           レベリング設定
         </CardTitle>
         <CardDescription>
@@ -169,11 +169,11 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="rounded-md border bg-muted/40 px-3 py-3 md:px-4 md:py-4">
+        <div className="border border-border bg-secondary/35 px-3 py-3 md:px-4 md:py-4">
           <div className="grid gap-4 md:grid-cols-5">
             {/* レベル帯 */}
             <div className="space-y-1">
-              <Label htmlFor="startLevel" className="text-xs md:text-sm">
+              <Label htmlFor="startLevel">
                 開始レベル
               </Label>
               <Input
@@ -188,7 +188,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="endLevel" className="text-xs md:text-sm">
+              <Label htmlFor="endLevel">
                 終了レベル
               </Label>
               <Input
@@ -204,7 +204,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
 
             {/* 効率パラメータ */}
             <div className="space-y-1">
-              <Label htmlFor="expMult" className="text-xs md:text-sm">
+              <Label htmlFor="expMult">
                 経験値倍率
               </Label>
               <Input
@@ -222,7 +222,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="dps" className="text-xs md:text-sm">
+              <Label htmlFor="dps">
                 平均 DPS
               </Label>
               <Input
@@ -241,7 +241,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="topN" className="text-xs md:text-sm">
+              <Label htmlFor="topN">
                 上位 N 件
               </Label>
               <Input
@@ -260,7 +260,7 @@ export function ExpCalculatorForm({ onCalculate }: ExpCalculatorFormProps) {
           </div>
 
           {/* 野外のみトグル */}
-          <div className="mt-4 flex items-start justify-between gap-4 rounded-md bg-background/60 px-3 py-2">
+          <div className="mt-4 flex items-start justify-between gap-4 border border-border bg-background/60 px-3 py-2">
             <div className="space-y-0.5">
               <div className="text-xs font-medium">フィールドモンスターのみ</div>
               <p className="text-[11px] text-muted-foreground">

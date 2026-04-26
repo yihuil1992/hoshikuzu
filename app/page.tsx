@@ -1,5 +1,10 @@
+import { StandaloneThemeProvider } from '@/components/standalone-theme';
 import StarField from '@/components/starfield/starfield';
 
 export default function Home() {
-  return <StarField />;
+  return (
+    <StandaloneThemeProvider>
+      <StarField />
+    </StandaloneThemeProvider>
+  );
 }

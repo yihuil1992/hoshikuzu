@@ -48,13 +48,12 @@ export default function GrindingPlannerPage() {
   }, [result]);
 
   return (
-    <div className="min-h-dvh bg-[radial-gradient(1200px_600px_at_50%_-100px,theme(colors.sky.100/.6),transparent),radial-gradient(800px_400px_at_120%_-50px,theme(colors.pink.100/.6),transparent)]">
+    <div className="min-h-dvh">
       <ExpCalculatorHero />
 
       <Separator className="mx-auto max-w-5xl" />
 
-      <section className="space-y-8 px-6 py-10 sm:px-10 md:px-16 lg:px-20">
-        {/* 顶部：表单 + 等级惩罚图 */}
+      <section className="space-y-8 px-2 py-10 sm:px-4">
         <div className="grid gap-4 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <ExpCalculatorForm
             onCalculate={({
@@ -86,7 +85,7 @@ export default function GrindingPlannerPage() {
           <ExpCalculatorTable rows={flatRows} />
         </div>
 
-        <div className="mx-auto max-w-5xl rounded-xl border bg-card p-4 text-xs text-muted-foreground">
+        <div className="mx-auto max-w-5xl border border-border bg-card/70 p-4 text-xs leading-6 text-muted-foreground">
           ここでの計算結果は HP・経験値テーブル・レベル補正などに基づいた概算です。
           実際の効率は装備・沸き具合・ラグなどによって変動するため、
           厳密なシミュレーターではなくレベリング計画用の目安として利用してください。

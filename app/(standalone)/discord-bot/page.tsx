@@ -1,19 +1,16 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import {
   Bot,
   Command,
   Bell,
   Users,
-  Shield,
   Sparkles,
   Github,
   ExternalLink,
   Copy,
   Check,
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
@@ -29,43 +26,31 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-
-/**
- * BotPage (Japanese)
- * - Tailwind v4 + shadcn/ui
- * - A marketing-style page that introduces the bot and its commands
- *
- * Drop into: app/(marketing)/bot/page.tsx (or similar)
- *
- * Notes:
- * - Replace BOT_INVITE_URL / SUPPORT_SERVER_URL / REPO_URL
- * - Replace commands to match your actual bot
- */
 
 const BOT_NAME = 'Hoshikuzu Bot';
 const BOT_TAGLINE = '必要な情報を、必要な人に、ちょうどよく。';
 
-// TODO: replace these URLs
 const BOT_INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1456103159473639444';
 const SUPPORT_SERVER_URL: string | undefined = undefined;
-const REPO_URL: string | undefined = undefined; // e.g. 'https://github.com/your/repo' (or keep undefined for private)
+const REPO_URL: string | undefined = undefined;
 
 function CommandRow({ cmd, desc, example }: { cmd: string; desc: string; example?: string }) {
   const [copied, setCopied] = useState(false);
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border bg-card/60 p-4">
+    <div className="flex flex-col gap-2 border border-border bg-secondary/35 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <code className="rounded-md bg-muted px-2 py-1 text-sm">{cmd}</code>
+            <code className="rounded-[2px] border border-border bg-background px-2 py-1 text-sm text-foreground">
+              {cmd}
+            </code>
             <span className="text-sm text-muted-foreground">{desc}</span>
           </div>
           {example ? (
             <div className="mt-2 text-xs text-muted-foreground">
               <span className="mr-2 inline-flex items-center rounded-full border bg-background px-2 py-0.5">
-                例
+                EX
               </span>
               <code className="break-words">{example}</code>
             </div>
@@ -96,30 +81,41 @@ function CommandRow({ cmd, desc, example }: { cmd: string; desc: string; example
 }
 
 function BotCover({ title }: { title: string }) {
-  const [loading, setLoading] = useState(true);
-
-  // This is a placeholder cover. Replace with an actual image or screenshot.
   return (
-    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border bg-gradient-to-br from-background to-muted">
-      {loading ? <Skeleton className="absolute inset-0" /> : null}
-      <div className="absolute inset-0 grid place-items-center">
-        <div className="text-center">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur">
-            <Sparkles className="size-4" />
-            {title}
-          </div>
-          <div className="mt-3 text-xs text-muted-foreground"></div>
+    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2px] border border-border bg-background">
+      <div
+        aria-hidden
+        className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:72px_72px]"
+      />
+      <div className="absolute inset-x-0 top-0 flex h-10 items-center justify-between border-b border-border px-4">
+        <div className="inline-flex items-center gap-2 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <Sparkles className="size-4 text-accent" />
+          {title}
+        </div>
+        <div className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          live signal
         </div>
       </div>
-      {/* trigger skeleton end */}
-      <Image
-        src="/assets/banner.png"
-        alt="banner"
-        width={1536}
-        height={1024}
-        className="h-full w-full object-cover"
-        onLoad={() => setLoading(false)}
-      />
+      <div className="absolute inset-0 grid place-items-center pt-10">
+        <div className="grid w-[min(32rem,82%)] gap-3">
+          {['guild watch', 'rank channel', 'history trace'].map((label, index) => (
+            <div
+              key={label}
+              className="flex items-center justify-between border border-border bg-card/55 px-4 py-3"
+            >
+              <div className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                <span className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {label}
+                </span>
+              </div>
+              <span className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                0{index + 1}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -156,7 +152,6 @@ export default function BotPage() {
       {
         group: 'ギルドチェック',
         icon: Users,
-        accent: 'from-emerald-500 via-green-600 to-teal-500',
         items: [
           {
             cmd: '/guild watch name:<ギルド名>',
@@ -182,7 +177,6 @@ export default function BotPage() {
       {
         group: 'ランキング通知設定',
         icon: Bell,
-        accent: 'from-sky-500 via-blue-600 to-indigo-500',
         items: [
           {
             cmd: '/rank channel target:<チャンネル>',
@@ -196,9 +190,8 @@ export default function BotPage() {
   );
 
   return (
-    <div className="min-h-dvh bg-[radial-gradient(1200px_600px_at_50%_-100px,theme(colors.sky.100/.6),transparent),radial-gradient(800px_400px_at_120%_-50px,theme(colors.pink.100/.6),transparent)]">
-      {/* Hero */}
-      <section className="relative px-6 sm:px-10 md:px-16 lg:px-20 pt-16 pb-8">
+    <div lang="ja" className="min-h-dvh">
+      <section className="relative px-2 pt-16 pb-8 sm:px-4">
         <MotionDiv
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -207,12 +200,16 @@ export default function BotPage() {
           className="mx-auto max-w-6xl"
         >
           <div className="mx-auto max-w-3xl text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm text-muted-foreground bg-background/60 shadow-sm backdrop-blur">
-              <Sparkles className="size-4" />
-              Discord utilities
+            <div className="inline-flex items-center gap-2 border border-border bg-card/45 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Sparkles className="size-4 text-accent" />
+              Discord Signal
             </div>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">{BOT_NAME}</h1>
-            <p className="mt-3 text-balance text-muted-foreground">{BOT_TAGLINE}</p>
+            <h1 className="mt-5 text-4xl font-light leading-none text-foreground sm:text-5xl">
+              {BOT_NAME}
+            </h1>
+            <p className="mt-4 text-balance text-sm leading-6 text-muted-foreground">
+              {BOT_TAGLINE}
+            </p>
 
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild className="gap-2">
@@ -234,7 +231,9 @@ export default function BotPage() {
                   </Link>
                 </Button>
               ) : (
-                <div className="text-xs text-muted-foreground">Private repo</div>
+                <div className="text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Private repo
+                </div>
               )}
             </div>
           </div>
@@ -247,22 +246,21 @@ export default function BotPage() {
 
       <Separator className="mx-auto max-w-6xl" />
 
-      {/* Features */}
-      <section className="px-6 sm:px-10 md:px-16 lg:px-20 py-10">
+      <section className="px-2 py-10 sm:px-4">
         <div className="mx-auto max-w-6xl">
           <MotionDiv
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.45 }}
-            className="mx-auto max-w-3xl text-center"
+            className="mx-auto max-w-3xl"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm text-muted-foreground bg-background/60 shadow-sm backdrop-blur">
-              <Bot className="size-4" />
+            <div className="inline-flex items-center gap-2 border border-border px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Bot className="size-4 text-accent" />
               概要
             </div>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">できること</h2>
-            <p className="mt-2 text-muted-foreground">
+            <h2 className="mt-4 text-2xl font-normal sm:text-3xl">できること</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Flyff のランキングを定期的にチェックし、
               <strong>ギルド所属変動</strong>を検知して通知します。
               対象ギルドの登録・解除・一覧表示・履歴確認まで、最小限の操作で完結します。
@@ -280,10 +278,10 @@ export default function BotPage() {
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.45, delay: i * 0.05 }}
                 >
-                  <Card className="rounded-2xl border-muted/60 shadow-sm">
+                  <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-2">
-                        <span className="grid size-9 place-items-center rounded-xl border bg-background">
+                      <CardTitle className="flex items-center gap-3 normal-case tracking-normal">
+                        <span className="grid size-9 place-items-center border border-border bg-background">
                           <Icon className="size-5" />
                         </span>
                         {f.title}
@@ -292,13 +290,13 @@ export default function BotPage() {
                     </CardHeader>
                     <CardContent className="pt-0">
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary" className="rounded-full">
+                        <Badge variant="secondary">
                           Slash Commands
                         </Badge>
-                        <Badge variant="secondary" className="rounded-full">
+                        <Badge variant="secondary">
                           Roles
                         </Badge>
-                        <Badge variant="secondary" className="rounded-full">
+                        <Badge variant="secondary">
                           Notifications
                         </Badge>
                       </div>
@@ -313,24 +311,23 @@ export default function BotPage() {
 
       <Separator className="mx-auto max-w-6xl" />
 
-      {/* Commands */}
-      <section className="px-6 sm:px-10 md:px-16 lg:px-20 py-10">
+      <section className="px-2 py-10 sm:px-4">
         <div className="mx-auto max-w-6xl">
           <MotionDiv
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.45 }}
-            className="mx-auto max-w-3xl text-center"
+            className="mx-auto max-w-3xl"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm text-muted-foreground bg-background/60 shadow-sm backdrop-blur">
-              <Command className="size-4" />
+            <div className="inline-flex items-center gap-2 border border-border px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Command className="size-4 text-accent" />
               コマンド
             </div>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="mt-4 text-2xl font-normal sm:text-3xl">
               使い方（代表例）
             </h2>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               よく使うコマンドだけを掲載しています。実際の運用に合わせて自由に差し替えてください。
             </p>
           </MotionDiv>
@@ -346,14 +343,10 @@ export default function BotPage() {
                   viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.45, delay: i * 0.05 }}
                 >
-                  <Card className="group relative overflow-hidden border-muted/60 rounded-2xl">
-                    <div
-                      aria-hidden
-                      className={`pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r ${c.accent} opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-25`}
-                    />
+                  <Card className="overflow-hidden">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Icon className="size-5" /> {c.group}
+                      <CardTitle className="flex items-center gap-2 normal-case tracking-normal">
+                        <Icon className="size-5 text-accent" /> {c.group}
                       </CardTitle>
                       <CardDescription>
                         コピーアイコンでコマンドをワンクリックコピーできます。
@@ -381,9 +374,8 @@ export default function BotPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <section className="px-6 sm:px-10 md:px-16 lg:px-20 pb-16">
-        <div className="mx-auto max-w-6xl rounded-2xl border bg-card p-6 text-center text-sm text-muted-foreground">
+      <section className="px-2 pb-16 sm:px-4">
+        <div className="mx-auto max-w-6xl border border-border bg-card/70 p-6 text-center text-sm leading-6 text-muted-foreground">
           <div className="mx-auto max-w-3xl">
             <span className="font-medium text-foreground">{BOT_NAME}</span>{' '}
             は特定サーバー向けに調整される場合があります。機能・コマンドは予告なく追加・変更されることがあります。
@@ -405,17 +397,6 @@ export default function BotPage() {
         </div>
       </section>
 
-      {/* eslint-disable-next-line react/no-unknown-property */}
-      <style jsx global>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-30%);
-          }
-          100% {
-            transform: translateX(30%);
-          }
-        }
-      `}</style>
     </div>
   );
 }
