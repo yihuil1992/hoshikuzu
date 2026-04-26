@@ -1,6 +1,9 @@
 'use client';
+
 import * as React from 'react';
+
 import { Button } from '@/components/ui/button';
+
 import CountdownRing from './countdown-ring';
 import SoundSelect from './sound-select';
 
@@ -39,36 +42,45 @@ export default function CountdownCard({
   const pct = Math.max(0, Math.min(100, (seconds / Math.max(1, cycleStart)) * 100));
 
   return (
-    <div className="rounded-xl border bg-card p-4 w-fit mx-auto">
-      <h2 className="mb-2 text-xl font-extrabold text-center">{title}</h2>
+    <div className="mx-auto w-full border border-white/14 bg-card/80 p-5">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          {title}
+        </h2>
+        <div className="text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          {cycleStart}s cycle
+        </div>
+      </div>
 
-      <div className="mb-3">
+      <div className="mb-3 flex justify-center">
         <SoundSelect value={soundId} onChange={onSoundChange} />
       </div>
 
       {extra && <div className="mb-2">{extra}</div>}
 
-      <div className="flex items-center gap-3">
-        <Button variant="outline" size="icon" onClick={onMinus} className="rounded-lg">
+      <div className="flex items-center justify-center gap-3">
+        <Button variant="outline" size="icon" onClick={onMinus} aria-label={`Decrease ${title}`}>
           −
         </Button>
 
-        <CountdownRing value={pct} label={<div className="text-3xl font-bold">{seconds}</div>} />
+        <CountdownRing
+          value={pct}
+          label={<div className="text-4xl font-light tabular-nums text-foreground">{seconds}</div>}
+        />
 
-        <Button variant="outline" size="icon" onClick={onPlus} className="rounded-lg">
+        <Button variant="outline" size="icon" onClick={onPlus} aria-label={`Increase ${title}`}>
           +
         </Button>
       </div>
 
-      <div className="mt-3 flex gap-2 justify-center">
+      <div className="mt-4 flex justify-center gap-2">
         <Button
           onClick={onStartStop}
           variant={isRunning ? 'destructive' : 'default'}
-          className="font-semibold"
         >
           {isRunning ? 'Stop' : 'Start'}
         </Button>
-        <Button onClick={onReset} variant="outline" className="font-semibold">
+        <Button onClick={onReset} variant="outline">
           Reset
         </Button>
       </div>

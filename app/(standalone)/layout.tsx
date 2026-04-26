@@ -2,37 +2,20 @@
 import { ReactNode } from 'react';
 
 import BackHomeButton from '@/components/back-home-button';
-import { MotionDiv } from '@/components/motion-div';
 
-/**
- * App Router layout for: app/(standalone)/
- * Place your pages under:
- *   app/(standalone)/works/page.tsx
- *   app/(standalone)/meteo-timer/page.tsx
- *   app/(standalone)/terms/page.tsx
- *   app/(standalone)/privacy/page.tsx
- */
 export default function StandaloneLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-dvh bg-[radial-gradient(1200px_600px_at_50%_-120px,theme(colors.sky.100/.6),transparent),radial-gradient(800px_400px_at_120%_-50px,theme(colors.purple.100/.5),transparent)]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
-        <MotionDiv
-          initial={{ opacity: 0, y: -6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="mb-4"
-        >
+    <div className="min-h-dvh overflow-hidden bg-background text-foreground">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 opacity-45 [background-image:radial-gradient(circle_at_18%_22%,rgba(248,250,252,0.32)_0_1px,transparent_1px),radial-gradient(circle_at_74%_18%,rgba(170,215,220,0.22)_0_1px,transparent_1px),radial-gradient(circle_at_42%_76%,rgba(245,240,220,0.24)_0_1px,transparent_1px)] [background-size:280px_240px,360px_300px,440px_380px]"
+      />
+      <div className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6">
+        <div className="mb-4">
           <BackHomeButton />
-        </MotionDiv>
+        </div>
 
-        <MotionDiv
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.05 }}
-          className="pb-12"
-        >
-          {children}
-        </MotionDiv>
+        <div className="pb-16">{children}</div>
       </div>
     </div>
   );

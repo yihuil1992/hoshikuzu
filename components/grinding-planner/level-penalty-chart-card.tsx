@@ -8,9 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export function LevelPenaltyChartCard() {
   return (
-    <Card className="h-full border-muted/60">
+    <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-sm">レベル差ペナルティ</CardTitle>
+        <CardTitle className="text-sm normal-case tracking-normal">レベル差ペナルティ</CardTitle>
         <CardDescription className="text-xs">
           プレイヤーLvとモンスターLvの差によるダメージおよび獲得EXP補正率の参考グラフです。
         </CardDescription>
@@ -29,7 +29,7 @@ export function LevelPenaltyChartCard() {
             alt="level gap"
             width={900}
             height={650}
-            className="max-h-48 w-auto cursor-zoom-in object-contain"
+            className="max-h-48 w-auto cursor-zoom-in border border-white/10 object-contain"
           />
         </Zoom>
 

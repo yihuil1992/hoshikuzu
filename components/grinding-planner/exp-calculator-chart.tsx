@@ -32,7 +32,7 @@ export function ExpCalculatorChart({ data }: ExpCalculatorChartProps) {
   const current = activePoint ?? fallbackPoint;
 
   return (
-    <Card className="mx-auto max-w-5xl border-muted/60">
+    <Card className="mx-auto max-w-5xl">
       <CardHeader>
         <CardTitle>トップ1・レベルアップ所要時間</CardTitle>
         <CardDescription>
@@ -83,18 +83,18 @@ export function ExpCalculatorChart({ data }: ExpCalculatorChartProps) {
         </ChartContainer>
 
         {/* Hover 対応の stats セクション */}
-        <div className="mt-4 rounded-md border bg-muted/40 px-3 py-2 text-xs sm:text-sm">
+        <div className="mt-4 border border-white/12 bg-white/[0.03] px-3 py-2 text-xs sm:text-sm">
           {current ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                <div className="text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   現在のレベル
                 </div>
                 <div className="text-lg font-semibold sm:text-2xl">Lv {current.level}</div>
               </div>
 
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                <div className="text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   レベルアップまで
                 </div>
                 <div className="text-lg font-semibold sm:text-2xl">

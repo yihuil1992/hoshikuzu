@@ -37,38 +37,55 @@ export default function MeteoTimerPage() {
   useCountdownSounds(b.seconds, bSound);
 
   return (
-    <div className="flex flex-col gap-4">
-      <CountdownCard
-        title="消し炭"
-        seconds={k.seconds}
-        cycleStart={k.cycleStart} // 30 或 32
-        isRunning={k.isRunning}
-        onMinus={k.dec}
-        onPlus={() => k.inc(32)}
-        onStartStop={k.toggle}
-        onReset={() => k.reset(30)}
-        soundId={kSound}
-        onSoundChange={setKSound}
-        extra={
-          <SecondsSwitch
-            isThirty={k.cycleStart === 30}
-            onToggle={() => k.setMax(k.cycleStart === 30 ? 32 : 30)}
-          />
-        }
-      />
+    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-2 pt-16 pb-16 sm:px-4">
+      <section>
+        <div className="flex items-center gap-3 text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <span>Meteo Timer</span>
+          <span className="h-px flex-1 bg-white/14" />
+          <span>2 instruments</span>
+        </div>
+        <h1 className="mt-5 text-4xl font-light leading-none text-foreground sm:text-5xl">
+          Meteo Timer
+        </h1>
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#c7d0dd]">
+          Two compact countdown instruments for repeated timing. Controls stay visible and quiet so
+          the rhythm is easy to read at a glance.
+        </p>
+      </section>
 
-      <CountdownCard
-        title="範囲技"
-        seconds={b.seconds}
-        cycleStart={b.cycleStart} // 固定 60
-        isRunning={b.isRunning}
-        onMinus={b.dec}
-        onPlus={() => b.inc(60)}
-        onStartStop={b.toggle}
-        onReset={() => b.reset(60)}
-        soundId={bSound}
-        onSoundChange={setBSound}
-      />
+      <div className="grid gap-4 md:grid-cols-2">
+        <CountdownCard
+          title="消し炭"
+          seconds={k.seconds}
+          cycleStart={k.cycleStart}
+          isRunning={k.isRunning}
+          onMinus={k.dec}
+          onPlus={() => k.inc(32)}
+          onStartStop={k.toggle}
+          onReset={() => k.reset(30)}
+          soundId={kSound}
+          onSoundChange={setKSound}
+          extra={
+            <SecondsSwitch
+              isThirty={k.cycleStart === 30}
+              onToggle={() => k.setMax(k.cycleStart === 30 ? 32 : 30)}
+            />
+          }
+        />
+
+        <CountdownCard
+          title="範囲技"
+          seconds={b.seconds}
+          cycleStart={b.cycleStart}
+          isRunning={b.isRunning}
+          onMinus={b.dec}
+          onPlus={() => b.inc(60)}
+          onStartStop={b.toggle}
+          onReset={() => b.reset(60)}
+          soundId={bSound}
+          onSoundChange={setBSound}
+        />
+      </div>
 
       <Separator className="my-1" />
 
@@ -76,11 +93,10 @@ export default function MeteoTimerPage() {
         <Button
           variant={k.isRunning || b.isRunning ? 'destructive' : 'default'}
           onClick={k.isRunning || b.isRunning ? stopBoth : startBoth}
-          className="font-semibold"
         >
           {k.isRunning || b.isRunning ? 'Stop Both' : 'Start Both'}
         </Button>
-        <Button variant="outline" onClick={resetBoth} className="font-semibold">
+        <Button variant="outline" onClick={resetBoth}>
           Reset Both
         </Button>
       </div>

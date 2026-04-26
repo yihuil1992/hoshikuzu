@@ -14,11 +14,11 @@ type Props = {
 
 export default function CountdownRing({
   value,
-  size = 112,
-  thickness = 10,
+  size = 128,
+  thickness = 8,
   label,
-  colorClass = 'stroke-primary',
-  bgClass = 'stroke-muted',
+  colorClass = 'stroke-[#aad7dc]',
+  bgClass = 'stroke-white/10',
   transitionMs = 250,
 }: Props) {
   const r = (size - thickness) / 2;
@@ -45,7 +45,10 @@ export default function CountdownRing({
           strokeLinecap="round"
           fill="none"
           strokeDasharray={`${dash} ${c - dash}`}
-          style={{ transition: `stroke-dasharray ${transitionMs}ms ease` }}
+          style={{
+            transition: `stroke-dasharray ${transitionMs}ms ease`,
+            filter: 'drop-shadow(0 0 10px rgba(170, 215, 220, 0.18))',
+          }}
         />
       </svg>
       {label && (
