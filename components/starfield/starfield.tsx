@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable react/no-unknown-property */
+
 import { OrbitControls, Stars, Sparkles, Html } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
@@ -14,8 +16,6 @@ import { presetStars } from '@/constants/star-presets';
 import { useRadialGlowTexture } from '@/hooks/use-radial-glow-texture';
 import {
   computeSafeRadius,
-  getRandomPosition,
-  randOnDisk,
   samplePositionsOnDisk,
 } from '@/lib/helpers';
 
@@ -23,10 +23,12 @@ import CameraFocus, { CameraPhase } from './camera-focus'; // ★ 引入独立�
 import { RotatingGroup } from './rotating-group';
 import { Star } from './star';
 
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+
 export default function StarField() {
   const router = useRouter();
   const glowTexture = useRadialGlowTexture();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
   const [aspect, setAspect] = useState(16 / 9);
   useEffect(() => {

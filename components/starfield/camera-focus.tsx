@@ -1,13 +1,16 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+
+import type { RefObject } from 'react';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 export type CameraPhase = 'idle' | 'focusing' | 'restoring';
 
 export type CameraFocusProps = {
-  controlsRef: React.RefObject<any>;
+  controlsRef: RefObject<OrbitControlsImpl | null>;
   target: THREE.Vector3 | null;
   active: boolean;
   zoomFactor?: number;
@@ -41,12 +44,12 @@ export default function CameraFocus({
   // 记录最近一次用于聚焦的目标位置（用于检测目标切换）
   const lastFocusTarget = useRef(new THREE.Vector3(NaN, NaN, NaN));
 
-  const setPhase = (p: CameraPhase) => {
+  const setPhase = useCallback((p: CameraPhase) => {
     if (mode.current !== p) {
       mode.current = p;
       onPhaseChange?.(p);
     }
-  };
+  }, [onPhaseChange]);
 
   // 聚焦动画进行中如用户开始拖拽，则取消动画（交出控制）
   useEffect(() => {
@@ -57,7 +60,7 @@ export default function CameraFocus({
     };
     controls.addEventListener?.('start', onStart);
     return () => controls.removeEventListener?.('start', onStart);
-  }, [controlsRef]);
+  }, [controlsRef, setPhase]);
 
   // 进入/离开聚焦 + 目标切换时的再聚焦
   useEffect(() => {
@@ -93,7 +96,7 @@ export default function CameraFocus({
     }
 
     wasActive.current = active;
-  }, [active, target, camera, controlsRef]);
+  }, [active, target, camera, controlsRef, setPhase]);
 
   useFrame((_, dt) => {
     const controls = controlsRef.current;
