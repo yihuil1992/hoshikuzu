@@ -25,6 +25,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+dev-server*.log
 
 # local env files
 .env*.local
@@ -35,3 +36,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local AI / agent workspaces
+/.agents/
+/.codex/
+/.claude/
+/.cursor/
+/.continue/
+/.gemini/
+/.roo/
+/.windsurf/
+.aider*
+
+# local starfield experiments not used by the app
+/hooks/use-star-core-texture.ts
+/public/star-assets/active/aura-toppng*.png
+/public/star-assets/active/core-light-01.png
