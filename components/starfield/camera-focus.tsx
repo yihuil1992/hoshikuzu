@@ -102,17 +102,18 @@ export default function CameraFocus({
     const controls = controlsRef.current;
     if (!controls) return;
 
-    if (mode.current === 'focusing' && target) {
+    if ((mode.current === 'focusing' || (active && target)) && target) {
       const desiredPos = new THREE.Vector3()
         .copy(target)
         .add(focusDir.current.clone().multiplyScalar(focusDist.current * zoomFactor));
 
-      const k = Math.min(1, dt * inDamp);
+      const k = Math.min(1, dt * (mode.current === 'focusing' ? inDamp : inDamp * 1.4));
       camera.position.lerp(desiredPos, k);
       controls.target.lerp(target, k);
       camera.lookAt(controls.target);
 
       if (
+        mode.current === 'focusing' &&
         camera.position.distanceTo(desiredPos) < 0.01 &&
         controls.target.distanceTo(target) < 0.005
       ) {

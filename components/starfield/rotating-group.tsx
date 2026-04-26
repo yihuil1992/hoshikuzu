@@ -11,8 +11,9 @@ export function RotatingGroup({
   const ref = useRef<THREE.Group>(null);
   useFrame(() => {
     if (ref.current && !paused) {
-      ref.current.rotation.y += 0.001;
-      ref.current.rotation.x += 0.0005;
+      ref.current.rotation.y += 0.00042;
+      ref.current.rotation.x += 0.00016;
+      ref.current.rotation.z += 0.00008;
     }
   });
   return <group ref={ref}>{children}</group>;
