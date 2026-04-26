@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable react/no-unknown-property */
+
 import { Html, Billboard } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef, useState } from 'react';
@@ -16,6 +18,11 @@ export type StarProps = {
   distanceScale: number;
   glowTexture: THREE.Texture;
 };
+
+function seededUnit(seed: number, salt: number) {
+  const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
 
 export function Star({
   position,
@@ -34,10 +41,10 @@ export function Star({
   const [hovered, setHovered] = useState(false);
 
   // 每颗星的随机参数
-  const phase = useMemo(() => Math.random() * Math.PI * 2, []);
-  const twinkleSpeed = useMemo(() => 0.6 + Math.random() * 0.7, []);
-  const baseScale = useMemo(() => 0.4 + Math.random() * 0.4, []);
-  const hueJitter = useMemo(() => (Math.random() - 0.5) * 0.1, []);
+  const phase = useMemo(() => seededUnit(index, 1) * Math.PI * 2, [index]);
+  const twinkleSpeed = useMemo(() => 0.6 + seededUnit(index, 2) * 0.7, [index]);
+  const baseScale = useMemo(() => 0.4 + seededUnit(index, 3) * 0.4, [index]);
+  const hueJitter = useMemo(() => (seededUnit(index, 4) - 0.5) * 0.1, [index]);
   const baseColor = useMemo(() => new THREE.Color(color), [color]);
 
   // 颜色：轻微偏白提亮，避免“灰”
@@ -51,19 +58,32 @@ export function Star({
   );
 
   // 材质（加法混合，关深度测试让边缘更柔）
-  const mkMat = (opacity: number) =>
-    new THREE.MeshBasicMaterial({
-      map: glowTexture,
-      transparent: true,
-      opacity,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      depthTest: false,
-      color: brightColor,
-    });
-
-  const innerMat = useMemo(() => mkMat(0.42), [glowTexture, brightColor]);
-  const outerMat = useMemo(() => mkMat(0.16), [glowTexture, brightColor]);
+  const innerMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        map: glowTexture,
+        transparent: true,
+        opacity: 0.42,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: false,
+        color: brightColor,
+      }),
+    [glowTexture, brightColor],
+  );
+  const outerMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        map: glowTexture,
+        transparent: true,
+        opacity: 0.16,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: false,
+        color: brightColor,
+      }),
+    [glowTexture, brightColor],
+  );
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -107,7 +127,6 @@ export function Star({
           onPointerOut={() => setHovered(false)}
         >
           <planeGeometry args={[1, 1]} />
-          {/* @ts-ignore */}
           <primitive object={outerMat} attach="material" />
         </mesh>
       </Billboard>
@@ -120,7 +139,6 @@ export function Star({
           onPointerOut={() => setHovered(false)}
         >
           <planeGeometry args={[1, 1]} />
-          {/* @ts-ignore */}
           <primitive object={innerMat} attach="material" />
         </mesh>
       </Billboard>
