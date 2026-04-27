@@ -17,6 +17,7 @@ import {
 } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 
+import AudioIndex from './audio-index';
 import CameraFocus, { CameraPhase } from './camera-focus'; // ★ 引入独立组件
 import { RotatingGroup } from './rotating-group';
 import { Star } from './star';
@@ -516,6 +517,8 @@ export default function StarField() {
 
       {/* 前景 UI 层（不挡拖拽；真正可点元素单独开 pointer-events） */}
       <div className="pointer-events-none fixed inset-0 z-10">
+        <AudioIndex isArchive={isArchive} />
+
         <section
           className={cn(
             'absolute left-6 top-6 max-w-[min(26rem,calc(100vw-3rem))] sm:left-10 sm:top-9',
