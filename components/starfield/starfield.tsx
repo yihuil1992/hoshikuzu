@@ -2,7 +2,7 @@
 
 /* eslint-disable react/no-unknown-property */
 
-import { OrbitControls, Stars, Sparkles, Html } from '@react-three/drei';
+import { OrbitControls, Html } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -23,55 +23,63 @@ import { Star } from './star';
 
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
+function seededUnit(seed: number, salt: number) {
+  const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 function ArchiveChartBackdrop() {
-  const latitudeGeometry = useMemo(() => {
-    const positions: number[] = [];
+  const latitudeGeometries = useMemo(() => {
     const radius = 22;
     const segments = 144;
     const latitudes = [-60, -45, -30, -15, 0, 15, 30, 45, 60];
 
-    for (const latitude of latitudes) {
+    return latitudes.map((latitude) => {
+      const points: THREE.Vector3[] = [];
       const phi = THREE.MathUtils.degToRad(latitude);
       const y = Math.sin(phi) * radius;
       const ringRadius = Math.cos(phi) * radius;
 
       for (let i = 0; i < segments; i += 1) {
         const a = (i / segments) * Math.PI * 2;
-        const b = ((i + 1) / segments) * Math.PI * 2;
-        positions.push(Math.cos(a) * ringRadius, y, Math.sin(a) * ringRadius);
-        positions.push(Math.cos(b) * ringRadius, y, Math.sin(b) * ringRadius);
+        points.push(new THREE.Vector3(Math.cos(a) * ringRadius, y, Math.sin(a) * ringRadius));
       }
-    }
 
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    return geometry;
+      return new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(points, true),
+        segments,
+        0.026,
+        4,
+        true,
+      );
+    });
   }, []);
 
-  const longitudeGeometry = useMemo(() => {
-    const positions: number[] = [];
+  const longitudeGeometries = useMemo(() => {
     const radius = 22;
     const segments = 144;
     const longitudes = Array.from({ length: 12 }, (_, index) => index * 15);
 
-    for (const longitude of longitudes) {
+    return longitudes.map((longitude) => {
+      const points: THREE.Vector3[] = [];
       const theta = THREE.MathUtils.degToRad(longitude);
       const cosTheta = Math.cos(theta);
       const sinTheta = Math.sin(theta);
 
       for (let i = 0; i < segments; i += 1) {
         const a = (i / segments) * Math.PI * 2;
-        const b = ((i + 1) / segments) * Math.PI * 2;
         const r1 = Math.cos(a) * radius;
-        const r2 = Math.cos(b) * radius;
-        positions.push(r1 * cosTheta, Math.sin(a) * radius, r1 * sinTheta);
-        positions.push(r2 * cosTheta, Math.sin(b) * radius, r2 * sinTheta);
+        points.push(new THREE.Vector3(r1 * cosTheta, Math.sin(a) * radius, r1 * sinTheta));
       }
-    }
 
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    return geometry;
+      return new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(points, true),
+        segments,
+        0.026,
+        4,
+        true,
+      );
+    });
   }, []);
 
   const dotGeometry = useMemo(() => {
@@ -98,36 +106,74 @@ function ArchiveChartBackdrop() {
 
   return (
     <group renderOrder={-10} rotation={[0.52, -0.62, 0.28]}>
-      <lineSegments geometry={latitudeGeometry}>
-        <lineBasicMaterial
-          color="#243040"
-          transparent
-          opacity={0.072}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </lineSegments>
-      <lineSegments geometry={longitudeGeometry}>
-        <lineBasicMaterial
-          color="#243040"
-          transparent
-          opacity={0.086}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </lineSegments>
+      {latitudeGeometries.map((geometry, index) => (
+        <mesh key={`latitude-${index}`} geometry={geometry}>
+          <meshBasicMaterial color="#d5dbd6" depthWrite={false} depthTest={false} />
+        </mesh>
+      ))}
+      {longitudeGeometries.map((geometry, index) => (
+        <mesh key={`longitude-${index}`} geometry={geometry}>
+          <meshBasicMaterial color="#d0d7d2" depthWrite={false} depthTest={false} />
+        </mesh>
+      ))}
       <points geometry={dotGeometry}>
         <pointsMaterial
           color="#243040"
           transparent
-          opacity={0.28}
-          size={0.035}
+          opacity={0.68}
+          size={0.105}
           sizeAttenuation
           depthWrite={false}
           depthTest
         />
       </points>
     </group>
+  );
+}
+
+function NightStarBackdrop() {
+  const starGeometry = useMemo(() => {
+    const positions: number[] = [];
+    const colors: number[] = [];
+    const colorA = new THREE.Color('#f8fafc');
+    const colorB = new THREE.Color('#aad7dc');
+    const colorC = new THREE.Color('#f5f0dc');
+
+    for (let i = 0; i < 1800; i += 1) {
+      const r1 = seededUnit(i, 11);
+      const r2 = seededUnit(i, 23);
+      const r3 = seededUnit(i, 37);
+      const theta = r1 * Math.PI * 2;
+      const phi = Math.acos(THREE.MathUtils.clamp(r2 * 2 - 1, -1, 1));
+      const radius = 32 + r3 * 18;
+      const x = Math.sin(phi) * Math.cos(theta) * radius;
+      const y = Math.cos(phi) * radius;
+      const z = Math.sin(phi) * Math.sin(theta) * radius;
+      positions.push(x, y, z);
+
+      const color = colorA.clone().lerp(colorB, r2 * 0.32).lerp(colorC, r3 * 0.12);
+      colors.push(color.r, color.g, color.b);
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    return geometry;
+  }, []);
+
+  return (
+    <points geometry={starGeometry} renderOrder={-20}>
+      <pointsMaterial
+        vertexColors
+        transparent
+        opacity={0.74}
+        size={1.18}
+        sizeAttenuation={false}
+        depthWrite={false}
+        depthTest={false}
+        fog={false}
+      />
+    </points>
   );
 }
 
@@ -155,16 +201,16 @@ export default function StarField() {
     const wide = aspect > 1.15;
     const composition = wide
       ? [
-          [0.08, 0.34, 0],
-          [0.56, 0.18, 0],
-          [-0.34, -0.34, 0],
-          [0.36, -0.52, 0],
+          [-0.18, 0.5, 0],
+          [0.7, 0.24, 0],
+          [-0.56, -0.42, 0],
+          [0.46, -0.66, 0],
         ]
       : [
-          [0.22, 0.2, 0],
-          [-0.28, -0.16, 0],
-          [0.24, -0.42, 0],
-          [-0.18, 0.44, 0],
+          [0.34, 0.32, 0],
+          [-0.42, -0.1, 0],
+          [0.28, -0.62, 0],
+          [-0.26, 0.62, 0],
         ];
 
     const positions = composition.map(
@@ -179,7 +225,7 @@ export default function StarField() {
   }, [SAFE_RADIUS, aspect]);
 
   const starDensityScale = useMemo(
-    () => THREE.MathUtils.clamp(Math.sqrt(36 / Math.max(presetStars.length, 1)), 0.7, 3.2),
+    () => THREE.MathUtils.clamp(Math.sqrt(64 / Math.max(presetStars.length, 1)), 0.9, 4.6),
     [],
   );
   const starWorldPositionRefs = useMemo(
@@ -265,7 +311,16 @@ export default function StarField() {
       >
         <Canvas
           className="absolute inset-0"
-          gl={{ alpha: false }}
+          gl={async (props) => {
+            const { WebGPURenderer } = await import('three/webgpu');
+            const renderer = new WebGPURenderer({
+              ...props,
+              alpha: false,
+              antialias: true,
+            });
+            await renderer.init();
+            return renderer;
+          }}
           camera={{ position: [0, 0, 9.5], fov: 50 }}
           onPointerMissed={() => {
             if (open) handleClose();
@@ -300,17 +355,7 @@ export default function StarField() {
           {isArchive ? (
             <ArchiveChartBackdrop />
           ) : (
-            <>
-              <Stars radius={76} depth={64} count={5600} factor={3.1} fade speed={0.55} />
-              <Sparkles
-                size={1.4}
-                speed={0.18}
-                count={34}
-                scale={28}
-                opacity={0.24}
-                color="#b9e4ee"
-              />
-            </>
+            <NightStarBackdrop />
           )}
 
           <Suspense fallback={null}>
