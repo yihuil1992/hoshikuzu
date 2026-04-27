@@ -9,6 +9,15 @@ import Providers from './providers';
 export const metadata = {
   title: 'ほしくず',
   description: '',
+  icons: {
+    icon: [
+      { url: '/resources/favicon.ico', sizes: 'any' },
+      { url: '/resources/favicon.svg', type: 'image/svg+xml' },
+      { url: '/resources/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/resources/favicon-16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: '/resources/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
