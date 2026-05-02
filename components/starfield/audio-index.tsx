@@ -153,6 +153,11 @@ function formatTime(seconds: number, fallback = '0:00') {
   return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
+function clampAudioVolume(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(1, Math.max(0, value));
+}
+
 export default function AudioIndex({ isArchive }: { isArchive: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isTrackListOpen, setIsTrackListOpen] = useState(false);
@@ -228,7 +233,7 @@ export default function AudioIndex({ isArchive }: { isArchive: boolean }) {
 
   const getEffectiveVolume = useCallback((track: Track, muted = isMuted) => {
     if (muted) return 0;
-    return Math.min(1, masterVolume * track.gain);
+    return clampAudioVolume(masterVolume * track.gain);
   }, [isMuted, masterVolume]);
 
   const clearScheduler = useCallback(() => {
@@ -457,23 +462,27 @@ export default function AudioIndex({ isArchive }: { isArchive: boolean }) {
     const audio = audioRef.current;
     if (!audio) return;
 
+    const safeTargetVolume = clampAudioVolume(targetVolume);
+
     if (fileFadeFrameRef.current !== null) {
       window.cancelAnimationFrame(fileFadeFrameRef.current);
       fileFadeFrameRef.current = null;
     }
 
     if (durationMs <= 0) {
-      audio.volume = targetVolume;
+      audio.volume = safeTargetVolume;
       return;
     }
 
-    const startVolume = audio.volume;
+    const startVolume = clampAudioVolume(audio.volume);
     const startedAt = window.performance.now();
 
     const tick = (now: number) => {
       const progress = Math.min(1, (now - startedAt) / durationMs);
       const eased = 1 - (1 - progress) ** 4;
-      audio.volume = startVolume + (targetVolume - startVolume) * eased;
+      audio.volume = clampAudioVolume(
+        startVolume + (safeTargetVolume - startVolume) * eased,
+      );
 
       if (progress < 1) {
         fileFadeFrameRef.current = window.requestAnimationFrame(tick);
@@ -536,7 +545,7 @@ export default function AudioIndex({ isArchive }: { isArchive: boolean }) {
     audio.currentTime = 0;
     audio.loop = false;
     audio.muted = isMuted;
-    audio.volume = fadeIn ? 0 : getEffectiveVolume(track);
+    audio.volume = fadeIn ? 0 : clampAudioVolume(getEffectiveVolume(track));
     void audio.play().catch(() => undefined);
     fadeFileVolume(getEffectiveVolume(track), fadeIn ? FADE_IN_MS : 0);
   }, [fadeFileVolume, getEffectiveVolume, isMuted]);

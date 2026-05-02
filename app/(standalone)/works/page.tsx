@@ -86,9 +86,10 @@ export default function WorksPage() {
   const items: Array<{
     title: string;
     url: string;
+    primaryLabel?: string;
     description: string;
     tags: string[];
-    repo?: string;
+    repo?: string | null;
     code: string;
     imageSrc: string;
   }> = [
@@ -110,6 +111,17 @@ export default function WorksPage() {
       code: 'WORK-02',
       imageSrc: '/assets/works/digxipop.png',
     },
+    {
+      title: 'Key Trigger Countdown',
+      url: 'https://github.com/yihuil1992/key-trigger-countdown',
+      primaryLabel: 'View project',
+      description:
+        'Compact Windows countdown tool built with Tauri. It listens for a selected global key and restarts the running timer without requiring app focus.',
+      tags: ['Tauri', 'Rust', 'TypeScript', 'Windows'],
+      repo: null,
+      code: 'WORK-03',
+      imageSrc: '/assets/works/key-trigger-countdown.png',
+    },
   ];
 
   return (
@@ -120,7 +132,7 @@ export default function WorksPage() {
           <div className="flex flex-wrap items-center gap-3 text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--works-muted)]">
             <span>Selected Work</span>
             <span className="h-px min-w-24 flex-1 bg-[color:var(--works-line)]" />
-            <span>02 Records</span>
+            <span>{String(items.length).padStart(2, '0')} Records</span>
           </div>
           <h1 className="mt-6 max-w-2xl text-4xl font-light leading-none text-[color:var(--works-ink)] sm:text-5xl">
             Works
@@ -180,7 +192,7 @@ export default function WorksPage() {
                     className="gap-2 border-[color:var(--works-primary)] bg-[color:var(--works-primary)] text-[color:var(--works-primary-text)] hover:bg-[color:var(--works-primary)]/90"
                   >
                     <Link href={item.url} target="_blank" rel="noreferrer">
-                      Visit site <ExternalLink className="size-4" />
+                      {item.primaryLabel ?? 'Visit site'} <ExternalLink className="size-4" />
                     </Link>
                   </Button>
 
@@ -190,8 +202,10 @@ export default function WorksPage() {
                         <Github className="size-4" /> Source
                       </Link>
                     </Button>
-                  ) : (
+                  ) : item.repo === undefined ? (
                     <div className="text-xs text-[color:var(--works-muted)]">Private repo</div>
+                  ) : (
+                    <div aria-hidden className="w-px" />
                   )}
                 </CardFooter>
               </Card>

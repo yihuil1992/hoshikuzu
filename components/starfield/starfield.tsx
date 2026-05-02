@@ -587,6 +587,17 @@ export default function StarField() {
           </Link>
           <span className={isArchive ? 'text-[#8a94a0]' : 'text-white/18'}>/</span>
           <Link
+            href="https://github.com/yihuil1992/hoshikuzu"
+            className={cn(
+              'pointer-events-auto text-[11px] font-medium uppercase transition-colors',
+              isArchive ? 'text-[#66727f] hover:text-[#172033]' : 'text-white/48 hover:text-white/88',
+            )}
+            style={{ letterSpacing: '0.12em' }}
+          >
+            GitHub
+          </Link>
+          <span className={isArchive ? 'text-[#8a94a0]' : 'text-white/18'}>/</span>
+          <Link
             href="/terms-of-service"
             className={cn(
               'pointer-events-auto text-[11px] font-medium uppercase transition-colors',
