@@ -20,6 +20,28 @@ import { cn } from '@/lib/utils';
 
 type WorksMode = 'archive' | 'night';
 
+type BaseWorkItem = {
+  title: string;
+  url: string;
+  primaryLabel?: string;
+  description: string;
+  tags: string[];
+  repo?: string | null;
+  code: string;
+};
+
+type SiteWorkItem = BaseWorkItem & {
+  imageSrc: string;
+  preview?: 'site';
+};
+
+type RepoWorkItem = BaseWorkItem & {
+  imageSrc?: string;
+  preview: 'repo';
+};
+
+type WorkItem = SiteWorkItem | RepoWorkItem;
+
 const worksTheme = {
   archive: {
     page:
@@ -79,20 +101,83 @@ function SitePreview({
   );
 }
 
+function RepoPreview({ url, mode }: { url: string; mode: WorksMode }) {
+  return (
+    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2px] border border-[color:var(--works-line)] bg-[color:var(--works-photo)]">
+      <div className="absolute inset-x-0 top-0 flex h-8 items-center gap-2 border-b border-[color:var(--works-line)] px-3">
+        <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--works-accent)]/75" />
+        <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--works-faint)]/70" />
+        <span className="truncate text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--works-muted)]">
+          {new URL(url).hostname}
+        </span>
+      </div>
+      <div
+        className={cn(
+          'absolute inset-x-0 bottom-0 top-8 overflow-hidden p-4 transition-[opacity,filter] duration-300 ease-[var(--ease-out-quint)] group-hover:opacity-100 group-hover:saturate-100',
+          mode === 'archive' ? 'opacity-95 saturate-[0.9]' : 'opacity-85 saturate-[0.86]',
+        )}
+      >
+        <div className="flex h-full flex-col border border-[color:var(--works-line)] bg-[color:var(--works-panel)]">
+          <div className="flex items-center gap-2 border-b border-[color:var(--works-line)] px-3 py-2">
+            <Github className="size-4 text-[color:var(--works-accent)]" />
+            <span className="truncate text-xs font-semibold text-[color:var(--works-ink)]">
+              yihuil1992 / agent-skills
+            </span>
+          </div>
+          <div className="grid min-h-0 flex-1 grid-cols-[1fr_0.82fr]">
+            <div className="space-y-2 border-r border-[color:var(--works-line)] p-3">
+              {['dist', 'docs', 'scripts', 'skills'].map((folder) => (
+                <div
+                  key={folder}
+                  className="flex items-center justify-between gap-3 border-b border-[color:var(--works-line)]/70 pb-1 text-xs"
+                >
+                  <span className="font-medium text-[color:var(--works-ink)]">{folder}</span>
+                  <span className="font-mono text-[0.625rem] text-[color:var(--works-faint)]">
+                    dir
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col justify-between p-3">
+              <div>
+                <div className="text-sm font-semibold text-[color:var(--works-ink)]">
+                  Agent Skills
+                </div>
+                <p className="mt-1 line-clamp-3 text-xs leading-5 text-[color:var(--works-muted)]">
+                  Portable SKILL.md folders for AI coding agents.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                {['spec-driven-workflow', 'pr-land'].map((skill) => (
+                  <div
+                    key={skill}
+                    className="truncate bg-[color:var(--works-accent)]/10 px-2 py-1 font-mono text-[0.625rem] text-[color:var(--works-accent)]"
+                  >
+                    {skill}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-0 transition-opacity duration-300 ease-[var(--ease-out-quint)] group-hover:opacity-70',
+            mode === 'archive'
+              ? 'bg-[linear-gradient(to_bottom,rgba(247,248,243,0.02),rgba(247,248,243,0.2))]'
+              : 'bg-[linear-gradient(to_bottom,rgba(2,4,10,0.03),rgba(2,4,10,0.24))]',
+          )}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function WorksPage() {
   const { mode } = useStandaloneTheme();
   const theme = worksTheme[mode];
 
-  const items: Array<{
-    title: string;
-    url: string;
-    primaryLabel?: string;
-    description: string;
-    tags: string[];
-    repo?: string | null;
-    code: string;
-    imageSrc: string;
-  }> = [
+  const items: WorkItem[] = [
     {
       title: 'Shaking Crab',
       url: 'https://shakingcrab.com',
@@ -121,6 +206,17 @@ export default function WorksPage() {
       repo: null,
       code: 'WORK-03',
       imageSrc: '/assets/works/key-trigger-countdown.png',
+    },
+    {
+      title: 'Agent Skills',
+      url: 'https://github.com/yihuil1992/agent-skills',
+      primaryLabel: 'View repo',
+      description:
+        'Portable SKILL.md folders for AI coding agents, with installable workflows for Codex, Claude Code, GitHub Copilot agent skills, and similar harnesses.',
+      tags: ['Agent Skills', 'Codex', 'Claude Code', 'GitHub Copilot'],
+      repo: null,
+      code: 'WORK-04',
+      preview: 'repo',
     },
   ];
 
@@ -157,7 +253,12 @@ export default function WorksPage() {
                     <span>{new URL(item.url).hostname}</span>
                   </div>
                   <CardTitle className="flex items-center gap-2 text-base normal-case tracking-normal text-[color:var(--works-ink)]">
-                    <Globe className="size-4 text-[color:var(--works-accent)]" /> {item.title}
+                    {item.preview === 'repo' ? (
+                      <Github className="size-4 text-[color:var(--works-accent)]" />
+                    ) : (
+                      <Globe className="size-4 text-[color:var(--works-accent)]" />
+                    )}
+                    {item.title}
                   </CardTitle>
                   <CardDescription className="text-[color:var(--works-muted)]">
                     {item.description}
@@ -165,12 +266,16 @@ export default function WorksPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="relative">
-                    <SitePreview
-                      url={item.url}
-                      title={item.title}
-                      imageSrc={item.imageSrc}
-                      mode={mode}
-                    />
+                    {item.preview === 'repo' ? (
+                      <RepoPreview url={item.url} mode={mode} />
+                    ) : (
+                      <SitePreview
+                        url={item.url}
+                        title={item.title}
+                        imageSrc={item.imageSrc}
+                        mode={mode}
+                      />
+                    )}
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
