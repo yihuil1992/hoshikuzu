@@ -38,6 +38,13 @@ type SiteWorkItem = BaseWorkItem & {
 type RepoWorkItem = BaseWorkItem & {
   imageSrc?: string;
   preview: 'repo';
+  repoPreview: {
+    ownerRepo: string;
+    folders: string[];
+    title: string;
+    summary: string;
+    highlights: string[];
+  };
 };
 
 type WorkItem = SiteWorkItem | RepoWorkItem;
@@ -101,7 +108,23 @@ function SitePreview({
   );
 }
 
-function RepoPreview({ url, mode }: { url: string; mode: WorksMode }) {
+function RepoPreview({
+  url,
+  mode,
+  ownerRepo,
+  folders,
+  title,
+  summary,
+  highlights,
+}: {
+  url: string;
+  mode: WorksMode;
+  ownerRepo: string;
+  folders: string[];
+  title: string;
+  summary: string;
+  highlights: string[];
+}) {
   return (
     <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2px] border border-[color:var(--works-line)] bg-[color:var(--works-photo)]">
       <div className="absolute inset-x-0 top-0 flex h-8 items-center gap-2 border-b border-[color:var(--works-line)] px-3">
@@ -121,12 +144,12 @@ function RepoPreview({ url, mode }: { url: string; mode: WorksMode }) {
           <div className="flex items-center gap-2 border-b border-[color:var(--works-line)] px-3 py-2">
             <Github className="size-4 text-[color:var(--works-accent)]" />
             <span className="truncate text-xs font-semibold text-[color:var(--works-ink)]">
-              yihuil1992 / agent-skills
+              {ownerRepo}
             </span>
           </div>
           <div className="grid min-h-0 flex-1 grid-cols-[1fr_0.82fr]">
             <div className="space-y-2 border-r border-[color:var(--works-line)] p-3">
-              {['dist', 'docs', 'scripts', 'skills'].map((folder) => (
+              {folders.map((folder) => (
                 <div
                   key={folder}
                   className="flex items-center justify-between gap-3 border-b border-[color:var(--works-line)]/70 pb-1 text-xs"
@@ -141,19 +164,19 @@ function RepoPreview({ url, mode }: { url: string; mode: WorksMode }) {
             <div className="flex flex-col justify-between p-3">
               <div>
                 <div className="text-sm font-semibold text-[color:var(--works-ink)]">
-                  Agent Skills
+                  {title}
                 </div>
                 <p className="mt-1 line-clamp-3 text-xs leading-5 text-[color:var(--works-muted)]">
-                  Portable SKILL.md folders for AI coding agents.
+                  {summary}
                 </p>
               </div>
               <div className="space-y-1.5">
-                {['spec-driven-workflow', 'pr-land'].map((skill) => (
+                {highlights.map((highlight) => (
                   <div
-                    key={skill}
+                    key={highlight}
                     className="truncate bg-[color:var(--works-accent)]/10 px-2 py-1 font-mono text-[0.625rem] text-[color:var(--works-accent)]"
                   >
-                    {skill}
+                    {highlight}
                   </div>
                 ))}
               </div>
@@ -217,6 +240,24 @@ export default function WorksPage() {
       repo: null,
       code: 'WORK-04',
       preview: 'repo',
+      repoPreview: {
+        ownerRepo: 'yihuil1992 / agent-skills',
+        folders: ['dist', 'docs', 'scripts', 'skills'],
+        title: 'Agent Skills',
+        summary: 'Portable SKILL.md folders for AI coding agents.',
+        highlights: ['spec-driven-workflow', 'pr-land'],
+      },
+    },
+    {
+      title: 'Review Pilot',
+      url: 'https://yihuil1992.github.io/review-pilot',
+      primaryLabel: 'Visit demo',
+      description:
+        'Mobile-first review operations console for a single-owner local business, with Google review triage, AI reply drafts, safe publish flows, and Twilio notification tasks.',
+      tags: ['Next.js', 'NestJS', 'Google Reviews', 'Twilio'],
+      repo: 'https://github.com/yihuil1992/review-pilot',
+      code: 'WORK-05',
+      imageSrc: '/assets/works/review-pilot.png',
     },
   ];
 
@@ -267,7 +308,7 @@ export default function WorksPage() {
                 <CardContent>
                   <div className="relative">
                     {item.preview === 'repo' ? (
-                      <RepoPreview url={item.url} mode={mode} />
+                      <RepoPreview url={item.url} mode={mode} {...item.repoPreview} />
                     ) : (
                       <SitePreview
                         url={item.url}
