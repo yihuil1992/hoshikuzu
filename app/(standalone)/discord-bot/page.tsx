@@ -10,29 +10,125 @@ import {
   ExternalLink,
   Copy,
   Check,
+  Volume2,
+  Database,
+  ShieldCheck,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { MotionDiv } from '@/components/motion-div';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 const BOT_NAME = 'Hoshikuzu Bot';
-const BOT_TAGLINE = '必要な情報を、必要な人に、ちょうどよく。';
+const BOT_TAGLINE = 'Flyff Universe のギルドチェック、メンバー照会、プレイヤー名の発音リンクまで。';
 
-const BOT_INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1456103159473639444';
 const SUPPORT_SERVER_URL: string | undefined = undefined;
-const REPO_URL: string | undefined = undefined;
+const REPO_URL = 'https://github.com/Startust/hoshikuzu-bot';
+
+const features = [
+  {
+    icon: Bell,
+    title: 'ランキング更新を定期チェック',
+    desc: '設定された Flyff サーバーのランキングを取得し、スナップショットと差分を保存します。',
+    badges: ['Polling', 'Snapshots', 'Diffs'],
+  },
+  {
+    icon: Users,
+    title: '加入・脱退・移籍・改名を通知',
+    desc: 'フォロー中のギルドで起きた所属変動や名前変更を、指定チャンネルにまとめて通知します。',
+    badges: ['Join / Leave', 'Transfer', 'Rename'],
+  },
+  {
+    icon: Command,
+    title: 'メンバー一覧と履歴を slash command で',
+    desc: 'ギルドの現在メンバー、フォロー状況、履歴を Discord 上から確認できます。',
+    badges: ['/guild', '/rank', 'Autocomplete'],
+  },
+  {
+    icon: Volume2,
+    title: 'プレイヤー名の発音リンク',
+    desc: '音声が用意されている名前には、通知やメンバー一覧から発音を聞けるリンクを添えます。',
+    badges: ['Audio Links', 'Local TTS', 'S3'],
+  },
+  {
+    icon: Database,
+    title: 'Prisma + MySQL で履歴を保持',
+    desc: 'ランキング、ギルドメンバー、イベント、発音 URL をデータベースに蓄積します。',
+    badges: ['Prisma', 'MySQL', 'Events'],
+  },
+  {
+    icon: ShieldCheck,
+    title: '導入先を allowlist で管理',
+    desc: '管理用サーバーから許可済み Discord guild を管理し、想定外の参加を抑制します。',
+    badges: ['Allowlist', 'Owner Ops', 'Safety'],
+  },
+];
+
+const commands = [
+  {
+    group: 'ギルドチェック',
+    icon: Users,
+    items: [
+      {
+        cmd: '/guild watch name:<ギルド名>',
+        desc: '指定した Flyff ギルドをフォローします。',
+        example: "/guild watch name:'ExampleGuild'",
+      },
+      {
+        cmd: '/guild unwatch name:<ギルド名>',
+        desc: '指定した Flyff ギルドのフォローを解除します。',
+        example: "/guild unwatch name:'ExampleGuild'",
+      },
+      {
+        cmd: '/guild list',
+        desc: 'フォロー中のギルド一覧を表示します。',
+      },
+      {
+        cmd: '/guild history name:<ギルド名> limit:<1-50?>',
+        desc: '加入、脱退、移籍、改名などの履歴をページ付きで表示します。',
+        example: "/guild history name:'ExampleGuild' limit:20",
+      },
+      {
+        cmd: '/guild members name:<ギルド名>',
+        desc: 'ランキング上の現在メンバーを表示し、発音音声があればリンクを添えます。',
+        example: "/guild members name:'ExampleGuild'",
+      },
+    ],
+  },
+  {
+    group: 'ランキング通知設定',
+    icon: Bell,
+    items: [
+      {
+        cmd: '/rank channel target:<チャンネル>',
+        desc: 'ランキング更新通知を送信するテキストチャンネルを設定します。',
+        example: '#rank-watch を指定',
+      },
+    ],
+  },
+  {
+    group: '管理者向け',
+    icon: ShieldCheck,
+    items: [
+      {
+        cmd: '/allowlist add guild_id:<Discord Guild ID> note:<任意>',
+        desc: 'Bot の参加を許可するサーバーを追加します。',
+      },
+      {
+        cmd: '/allowlist remove guild_id:<Discord Guild ID>',
+        desc: '許可済みサーバーを allowlist から削除します。',
+      },
+      {
+        cmd: '/allowlist list limit:<1-100?>',
+        desc: '登録済み allowlist を確認します。',
+      },
+    ],
+  },
+];
 
 function CommandRow({ cmd, desc, example }: { cmd: string; desc: string; example?: string }) {
   const [copied, setCopied] = useState(false);
@@ -98,7 +194,7 @@ function BotCover({ title }: { title: string }) {
       </div>
       <div className="absolute inset-0 grid place-items-center pt-10">
         <div className="grid w-[min(32rem,82%)] gap-3">
-          {['guild watch', 'rank channel', 'history trace'].map((label, index) => (
+          {['guild members', 'pronunciation link', 'rank notification'].map((label, index) => (
             <div
               key={label}
               className="flex items-center justify-between border border-border bg-card/55 px-4 py-3"
@@ -121,74 +217,6 @@ function BotCover({ title }: { title: string }) {
 }
 
 export default function BotPage() {
-  const features = useMemo(
-    () => [
-      {
-        icon: Bell,
-        title: 'ランキングの動向をチェックして通知',
-        desc: '指定したチャンネルに、ランキングの更新情報を自動で通知します。',
-      },
-      {
-        icon: Users,
-        title: 'ギルドをフォローして履歴を見る',
-        desc: '対象のギルドを登録し、所属変動などの履歴をコマンドから確認できます。',
-      },
-      {
-        icon: Sparkles,
-        title: 'ギルド変動を検知',
-        desc: 'ランキング上のプレイヤーのギルド所属変動を追跡し、差分を分かりやすくまとめます。',
-      },
-      {
-        icon: Command,
-        title: 'コマンドは2系統だけ',
-        desc: '「/guild」と「/rank」だけで運用できる、覚えやすい設計。',
-      },
-    ],
-    [],
-  );
-
-  const commands = useMemo(
-    () => [
-      {
-        group: 'ギルドチェック',
-        icon: Users,
-        items: [
-          {
-            cmd: '/guild watch name:<ギルド名>',
-            desc: '指定した Flyff ギルドをフォロー（対象に追加）します。',
-            example: "/guild watch name:'ExampleGuild'",
-          },
-          {
-            cmd: '/guild unwatch name:<ギルド名>',
-            desc: '指定した Flyff ギルドのフォローを解除（対象から削除）します。',
-            example: "/guild unwatch name:'ExampleGuild'",
-          },
-          {
-            cmd: '/guild list',
-            desc: 'フォロー中のギルド一覧を表示します。',
-          },
-          {
-            cmd: '/guild history name:<ギルド名> limit:<1-50?>',
-            desc: '指定ギルドの履歴（例：所属変動など）を表示します。',
-            example: "/guild history name:'ExampleGuild' limit:20",
-          },
-        ],
-      },
-      {
-        group: 'ランキング通知設定',
-        icon: Bell,
-        items: [
-          {
-            cmd: '/rank channel target:<チャンネル>',
-            desc: 'ランキング更新通知を送信するチャンネルを設定します。',
-            example: '#rank-watch を指定',
-          },
-        ],
-      },
-    ],
-    [],
-  );
-
   return (
     <div lang="ja" className="min-h-dvh">
       <section className="relative px-2 pt-16 pb-8 sm:px-4">
@@ -212,11 +240,6 @@ export default function BotPage() {
             </p>
 
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button asChild className="gap-2">
-                <Link href={BOT_INVITE_URL} target="_blank" rel="noreferrer">
-                  サーバーに追加 <ExternalLink className="size-4" />
-                </Link>
-              </Button>
               {SUPPORT_SERVER_URL && (
                 <Button asChild variant="outline" className="gap-2">
                   <Link href={SUPPORT_SERVER_URL} target="_blank" rel="noreferrer">
@@ -227,14 +250,10 @@ export default function BotPage() {
               {REPO_URL ? (
                 <Button asChild variant="outline" className="gap-2">
                   <Link href={REPO_URL} target="_blank" rel="noreferrer">
-                    <Github className="size-4" /> Source
+                    <Github className="size-4" /> GitHub
                   </Link>
                 </Button>
-              ) : (
-                <div className="text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  Private repo
-                </div>
-              )}
+              ) : null}
             </div>
           </div>
 
@@ -262,8 +281,9 @@ export default function BotPage() {
             <h2 className="mt-4 text-2xl font-normal sm:text-3xl">できること</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Flyff のランキングを定期的にチェックし、
-              <strong>ギルド所属変動</strong>を検知して通知します。
-              対象ギルドの登録・解除・一覧表示・履歴確認まで、最小限の操作で完結します。
+              <strong>ギルド所属変動</strong>と<strong>プレイヤー名の発音</strong>を Discord
+              の運用画面に届けます。
+              対象ギルドの登録、履歴確認、現在メンバー照会まで最小限の操作で完結します。
             </p>
           </MotionDiv>
 
@@ -290,15 +310,11 @@ export default function BotPage() {
                     </CardHeader>
                     <CardContent className="pt-0">
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary">
-                          Slash Commands
-                        </Badge>
-                        <Badge variant="secondary">
-                          Roles
-                        </Badge>
-                        <Badge variant="secondary">
-                          Notifications
-                        </Badge>
+                        {f.badges.map((badge) => (
+                          <Badge key={badge} variant="secondary">
+                            {badge}
+                          </Badge>
+                        ))}
                       </div>
                     </CardContent>
                   </Card>
@@ -324,11 +340,9 @@ export default function BotPage() {
               <Command className="size-4 text-accent" />
               コマンド
             </div>
-            <h2 className="mt-4 text-2xl font-normal sm:text-3xl">
-              使い方（代表例）
-            </h2>
+            <h2 className="mt-4 text-2xl font-normal sm:text-3xl">使い方（代表例）</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              よく使うコマンドだけを掲載しています。実際の運用に合わせて自由に差し替えてください。
+              公開されている slash command と、管理用 allowlist command の主要な使い方です。
             </p>
           </MotionDiv>
 
@@ -357,15 +371,6 @@ export default function BotPage() {
                         <CommandRow key={it.cmd} cmd={it.cmd} desc={it.desc} example={it.example} />
                       ))}
                     </CardContent>
-                    <CardFooter className="justify-between">
-                      {SUPPORT_SERVER_URL && (
-                        <Button asChild size="sm" variant="outline" className="gap-2">
-                          <Link href={SUPPORT_SERVER_URL} target="_blank" rel="noreferrer">
-                            詳細 <ExternalLink className="size-4" />
-                          </Link>
-                        </Button>
-                      )}
-                    </CardFooter>
                   </Card>
                 </MotionDiv>
               );
@@ -377,15 +382,10 @@ export default function BotPage() {
       <section className="px-2 pb-16 sm:px-4">
         <div className="mx-auto max-w-6xl border border-border bg-card/70 p-6 text-center text-sm leading-6 text-muted-foreground">
           <div className="mx-auto max-w-3xl">
-            <span className="font-medium text-foreground">{BOT_NAME}</span>{' '}
-            は特定サーバー向けに調整される場合があります。機能・コマンドは予告なく追加・変更されることがあります。
+            <span className="font-medium text-foreground">{BOT_NAME}</span> は Flyff Universe
+            のギルドチェック向けに調整されています。発音音声は事前生成済みの名前にのみ表示されます。
           </div>
           <div className="mt-4 flex items-center justify-center gap-3">
-            <Button asChild size="sm" className="gap-2">
-              <Link href={BOT_INVITE_URL} target="_blank" rel="noreferrer">
-                導入する <ExternalLink className="size-4" />
-              </Link>
-            </Button>
             {SUPPORT_SERVER_URL && (
               <Button asChild size="sm" variant="outline" className="gap-2">
                 <Link href={SUPPORT_SERVER_URL} target="_blank" rel="noreferrer">
@@ -393,10 +393,14 @@ export default function BotPage() {
                 </Link>
               </Button>
             )}
+            <Button asChild size="sm" variant="outline" className="gap-2">
+              <Link href={REPO_URL} target="_blank" rel="noreferrer">
+                <Github className="size-4" /> GitHub
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
-
     </div>
   );
 }
