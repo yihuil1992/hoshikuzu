@@ -37,7 +37,7 @@ export const presetStars: PresetStar[] = [
   {
     name: 'Discord Bot',
     url: '/discord-bot',
-    description: 'A bot for Flyff Universe servers.',
+    description: 'Flyff Universe guild monitoring with member lookup and pronunciation links.',
     color: '#ffdfba',
     emissive: '#ffb347',
     position: new THREE.Vector3(-1.5, -0.5, 0),
