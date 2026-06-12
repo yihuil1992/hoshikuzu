@@ -202,32 +202,54 @@ export default function StarField() {
     const wide = aspect > 1.15;
     const composition = wide
       ? [
-          [-0.18, 0.5, 0],
-          [0.7, 0.24, 0],
-          [-0.56, -0.42, 0],
-          [0.46, -0.66, 0],
+          [-0.56, 0.42, 0],
+          [0.56, 0.36, 0],
+          [0.08, 0.02, 0],
+          [-0.72, -0.42, 0],
+          [0.76, -0.44, 0],
+          [-0.08, -0.72, 0],
+          [0.02, 0.72, 0],
         ]
       : [
-          [0.34, 0.32, 0],
-          [-0.42, -0.1, 0],
-          [0.28, -0.62, 0],
-          [-0.26, 0.62, 0],
+          [-0.44, 0.42, 0],
+          [0.44, 0.3, 0],
+          [-0.46, -0.02, 0],
+          [0.44, -0.16, 0],
+          [-0.34, -0.46, 0],
+          [0.28, -0.66, 0],
+          [0.02, 0.66, 0],
         ];
 
-    const positions = composition.map(
-      ([x, y, z]) => new THREE.Vector3(x * SAFE_RADIUS, y * SAFE_RADIUS, z),
-    );
+    const positions = presetStars.map((_, index) => {
+      const point = composition[index % composition.length];
+      const ring = Math.floor(index / composition.length);
+      const ringScale = 0.88 - ring * 0.12;
+      const [x, y, z] = point;
+      return new THREE.Vector3(x * SAFE_RADIUS * ringScale, y * SAFE_RADIUS * ringScale, z);
+    });
 
     return presetStars.map((s, i) => ({
       ...s,
       position: positions[i],
-      prominence: i === 2 ? 1.18 : i === 1 ? 1.05 : 0.92,
+      prominence:
+        s.name === 'Grinding Planner'
+          ? 1.18
+          : s.name === 'Stardust Works'
+            ? 1.05
+            : s.name === 'Review Pilot' || s.name === 'Key Trigger Countdown'
+              ? 1
+              : s.name === 'Note Taker'
+                ? 1
+              : 0.92,
     }));
   }, [SAFE_RADIUS, aspect]);
 
   const starDensityScale = useMemo(
-    () => THREE.MathUtils.clamp(Math.sqrt(64 / Math.max(presetStars.length, 1)), 0.9, 4.6),
-    [],
+    () =>
+      aspect > 1.15
+        ? THREE.MathUtils.clamp(Math.sqrt(28 / Math.max(presetStars.length, 1)), 1.35, 2.25)
+        : THREE.MathUtils.clamp(Math.sqrt(10 / Math.max(presetStars.length, 1)), 0.95, 1.38),
+    [aspect],
   );
   const starWorldPositionRefs = useMemo(
     () => presetStars.map(() => ({ current: new THREE.Vector3() })),
