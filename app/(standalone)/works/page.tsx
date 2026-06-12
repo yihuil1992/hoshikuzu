@@ -23,7 +23,10 @@ type WorksMode = 'archive' | 'night';
 type BaseWorkItem = {
   title: string;
   url: string;
+  displayHost?: string;
   primaryLabel?: string;
+  externalUrl?: string;
+  externalLabel?: string;
   description: string;
   tags: string[];
   repo?: string | null;
@@ -64,16 +67,24 @@ const worksTheme = {
   },
 } satisfies Record<WorksMode, { page: string; atmosphere: string }>;
 
+function displayLocation(url: string, fallback?: string) {
+  if (fallback) return fallback;
+  if (url.startsWith('/')) return url.replace(/^\//, '') || 'hoshikuzu';
+  return new URL(url).hostname;
+}
+
 function SitePreview({
   url,
   title,
   imageSrc,
   mode,
+  displayHost,
 }: {
   url: string;
   title: string;
   imageSrc: string;
   mode: WorksMode;
+  displayHost?: string;
 }) {
   return (
     <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2px] border border-[color:var(--works-line)] bg-[color:var(--works-photo)]">
@@ -81,7 +92,7 @@ function SitePreview({
         <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--works-accent)]/75" />
         <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--works-faint)]/70" />
         <span className="truncate text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--works-muted)]">
-          {new URL(url).hostname}
+          {displayLocation(url, displayHost)}
         </span>
       </div>
       <div className="absolute inset-x-0 bottom-0 top-8 overflow-hidden">
@@ -221,8 +232,11 @@ export default function WorksPage() {
     },
     {
       title: 'Key Trigger Countdown',
-      url: 'https://github.com/yihuil1992/key-trigger-countdown',
-      primaryLabel: 'View project',
+      url: '/key-trigger-countdown',
+      displayHost: 'Windows desktop',
+      primaryLabel: 'Open record',
+      externalUrl: 'https://github.com/yihuil1992/key-trigger-countdown',
+      externalLabel: 'GitHub',
       description:
         'Compact Windows countdown tool built with Tauri. It listens for a selected global key and restarts the running timer without requiring app focus.',
       tags: ['Tauri', 'Rust', 'TypeScript', 'Windows'],
@@ -249,14 +263,31 @@ export default function WorksPage() {
       },
     },
     {
-      title: 'Review Pilot',
-      url: 'https://yihuil1992.github.io/review-pilot',
-      primaryLabel: 'Visit demo',
+      title: 'Note Taker',
+      url: '/note-taker',
+      displayHost: 'Windows desktop',
+      primaryLabel: 'Open record',
+      externalUrl: 'https://github.com/yihuil1992/note-taker',
+      externalLabel: 'GitHub',
       description:
-        'Mobile-first review operations console for a single-owner local business, with Google review triage, AI reply drafts, safe publish flows, and Twilio notification tasks.',
+        'Local-first meeting capture app for Windows. It records microphone and computer audio, transcribes with a local Whisper sidecar, summarizes with Codex CLI, and exports Markdown or JSON notes.',
+      tags: ['Tauri', 'Whisper', 'SQLite', 'Codex CLI'],
+      repo: null,
+      code: 'WORK-05',
+      imageSrc: '/assets/works/note-taker-night.png',
+    },
+    {
+      title: 'Review Pilot',
+      url: '/review-pilot',
+      displayHost: 'Hoshikuzu atlas UI',
+      primaryLabel: 'Open record',
+      externalUrl: 'https://yihuil1992.github.io/review-pilot',
+      externalLabel: 'Demo',
+      description:
+        'Mobile-first review operations for a single-owner local business, now using the Hoshikuzu night/archive atlas system for queues, drafts, safe publish flows, and Twilio tasks.',
       tags: ['Next.js', 'NestJS', 'Google Reviews', 'Twilio'],
       repo: 'https://github.com/yihuil1992/review-pilot',
-      code: 'WORK-05',
+      code: 'WORK-06',
       imageSrc: '/assets/works/review-pilot.png',
     },
   ];
@@ -291,7 +322,7 @@ export default function WorksPage() {
                 <CardHeader>
                   <div className="mb-2 flex items-center justify-between gap-3 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--works-muted)]">
                     <span>{item.code}</span>
-                    <span>{new URL(item.url).hostname}</span>
+                    <span>{displayLocation(item.url, item.displayHost)}</span>
                   </div>
                   <CardTitle className="flex items-center gap-2 text-base normal-case tracking-normal text-[color:var(--works-ink)]">
                     {item.preview === 'repo' ? (
@@ -315,6 +346,7 @@ export default function WorksPage() {
                         title={item.title}
                         imageSrc={item.imageSrc}
                         mode={mode}
+                        displayHost={item.displayHost}
                       />
                     )}
                   </div>
@@ -337,12 +369,22 @@ export default function WorksPage() {
                     size="sm"
                     className="gap-2 border-[color:var(--works-primary)] bg-[color:var(--works-primary)] text-[color:var(--works-primary-text)] hover:bg-[color:var(--works-primary)]/90"
                   >
-                    <Link href={item.url} target="_blank" rel="noreferrer">
+                    <Link
+                      href={item.url}
+                      target={item.url.startsWith('/') ? undefined : '_blank'}
+                      rel={item.url.startsWith('/') ? undefined : 'noreferrer'}
+                    >
                       {item.primaryLabel ?? 'Visit site'} <ExternalLink className="size-4" />
                     </Link>
                   </Button>
 
-                  {item.repo ? (
+                  {item.externalUrl ? (
+                    <Button asChild size="sm" variant="outline" className="gap-2">
+                      <Link href={item.externalUrl} target="_blank" rel="noreferrer">
+                        {item.externalLabel ?? 'Open'} <ExternalLink className="size-4" />
+                      </Link>
+                    </Button>
+                  ) : item.repo ? (
                     <Button asChild size="sm" variant="outline" className="gap-2">
                       <Link href={item.repo} target="_blank" rel="noreferrer">
                         <Github className="size-4" /> Source
