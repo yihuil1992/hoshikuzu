@@ -3,12 +3,12 @@
 import {
   Archive,
   Bot,
-  Database,
   Download,
   FileJson,
   Github,
   HardDrive,
   Mic,
+  Minimize2,
   MonitorSpeaker,
   Search,
   ShieldCheck,
@@ -29,22 +29,34 @@ const RELEASES_URL = `${REPO_URL}/releases`;
 const signals = [
   { label: 'Microphone', value: 'On', icon: Mic },
   { label: 'Computer audio', value: 'On', icon: MonitorSpeaker },
-  { label: 'Local AI', value: 'Ready', icon: Bot },
-  { label: 'Storage', value: 'SQLite', icon: Database },
+  { label: 'Mini mode', value: 'Ready', icon: Minimize2 },
+  { label: 'Release', value: 'v0.2.4', icon: Download },
 ];
 
 const capabilities = [
   {
     icon: Waves,
     title: 'Meeting capture',
-    desc: 'Records microphone and system audio on Windows in short persisted chunks.',
-    tags: ['Microphone', 'Computer audio', 'Tauri 2'],
+    desc: 'Records microphone and system audio on Windows as separate streams, then keeps source labels attached to the stored chunks.',
+    tags: ['Microphone', 'WASAPI loopback', 'Smart chunks'],
+  },
+  {
+    icon: Minimize2,
+    title: 'Mini recorder window',
+    desc: 'Offers a compact always-on-top recorder for meetings where the full archive console should stay out of the way.',
+    tags: ['Mini mode', 'Always on top'],
   },
   {
     icon: Bot,
-    title: 'Local transcription',
-    desc: 'Uses a Whisper-compatible sidecar by default, with optional OpenAI speech-to-text when selected.',
-    tags: ['whisper.cpp', 'large-v3-turbo', 'OpenAI optional'],
+    title: 'Provider-aware transcription',
+    desc: 'Runs local whisper.cpp by default, with optional OpenAI speech-to-text and local fallback when a cloud window fails.',
+    tags: ['large-v3-turbo', 'gpt-4o-transcribe', 'Fallback path'],
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Glossary and Chinese handling',
+    desc: 'Injects team vocabulary into Whisper prompts and normalizes Traditional Chinese transcript output to Simplified Chinese.',
+    tags: ['Custom glossary', 'OpenCC'],
   },
   {
     icon: Sparkles,
@@ -54,9 +66,9 @@ const capabilities = [
   },
   {
     icon: FileJson,
-    title: 'Exportable records',
-    desc: 'Stores meetings locally and exports selected records as Markdown or JSON notes.',
-    tags: ['Markdown', 'JSON', 'Local search'],
+    title: 'Exports and updates',
+    desc: 'Exports selected records as Markdown or JSON, then checks GitHub Releases for signed in-app updater bundles.',
+    tags: ['Markdown', 'JSON', 'Tauri updater'],
   },
 ];
 
@@ -64,7 +76,14 @@ const privacyNotes = [
   'Meeting records stay local-first in SQLite.',
   'Raw audio retention defaults to 7 days.',
   'Local Whisper transcription stays on device.',
-  'Cloud transcription is opt-in through provider settings.',
+  'OpenAI transcription is opt-in and uses the OS credential store.',
+];
+
+const releaseNotes = [
+  'Mini recorder gives the capture path a compact always-on-top surface.',
+  'Smart transcription windows skip silence and add short pre/post-roll.',
+  'Glossary prompting helps product names, acronyms, and Chinese terms survive transcription.',
+  'Signed updater checks GitHub Releases for v0.2.4 bundles.',
 ];
 
 function ScreenshotFrame({
@@ -94,6 +113,56 @@ function ScreenshotFrame({
           fill
           priority={src.endsWith('note-taker-night.png')}
           sizes="(min-width: 1024px) 54vw, 100vw"
+          className="object-contain object-top sm:object-cover"
+        />
+      </div>
+    </div>
+  );
+}
+
+function MobileScreenshotFrame() {
+  return (
+    <div className="mx-auto w-full max-w-[24rem] overflow-hidden border border-border bg-card">
+      <div className="flex h-10 items-center justify-between border-b border-border px-4">
+        <div className="inline-flex items-center gap-2 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <Archive className="size-4 text-accent" />
+          Mobile archive
+        </div>
+        <span className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          v0.2.4
+        </span>
+      </div>
+      <div className="relative aspect-[390/844] bg-background">
+        <Image
+          src="/assets/works/note-taker-mobile.png"
+          alt="Note Taker mobile Archive Sheet layout"
+          fill
+          sizes="(min-width: 1024px) 24rem, 100vw"
+          className="object-cover object-top"
+        />
+      </div>
+    </div>
+  );
+}
+
+function MiniRecorderFrame() {
+  return (
+    <div className="overflow-hidden border border-border bg-card">
+      <div className="flex h-10 items-center justify-between border-b border-border px-4">
+        <div className="inline-flex items-center gap-2 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <Minimize2 className="size-4 text-accent" />
+          Mini recorder
+        </div>
+        <span className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          compact
+        </span>
+      </div>
+      <div className="relative aspect-[468/290] bg-background">
+        <Image
+          src="/assets/works/note-taker-mini.png"
+          alt="Note Taker mini recorder window"
+          fill
+          sizes="(min-width: 1024px) 26rem, 100vw"
           className="object-cover object-top"
         />
       </div>
@@ -118,7 +187,8 @@ export default function NoteTakerPage() {
             </h1>
             <p className="mt-5 max-w-[19rem] text-sm leading-6 text-muted-foreground sm:max-w-xl">
               Note Taker sits beside a meeting, captures microphone and computer audio on Windows,
-              transcribes with local Whisper by default, then asks Codex CLI for structured notes.
+              opens a compact mini recorder when the full console is too much, then asks Codex CLI
+              for structured notes after transcription.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -190,18 +260,64 @@ export default function NoteTakerPage() {
               Built for meetings that should stay on the machine.
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              The app makes source readiness, provider state, storage path, transcript segments,
-              summary state, and export actions visible without turning the meeting record into a
-              cloud dashboard.
+              The app makes source readiness, mini-recorder access, provider state, credential
+              storage, transcript segments, summary state, release status, and export actions
+              visible without turning the meeting record into a cloud dashboard.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              {['Local SQLite', 'Whisper sidecar', 'Codex summary', 'Markdown export'].map((tag) => (
+              {['Mini mode', 'Whisper sidecar', 'OpenAI optional', 'Signed updater'].map((tag) => (
                 <Badge key={tag} variant="secondary">
                   {tag}
                 </Badge>
               ))}
             </div>
           </MotionDiv>
+        </div>
+      </section>
+
+      <section className="px-2 pb-12 sm:px-4">
+        <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
+          <MotionDiv
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.45 }}
+            className="border border-border bg-card/70 p-5 sm:p-6"
+          >
+            <div className="inline-flex items-center gap-2 border border-border px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Minimize2 className="size-4 text-accent" />
+              Mini mode
+            </div>
+            <h2 className="mt-4 text-2xl font-normal leading-tight text-foreground sm:text-3xl">
+              Mini mode keeps recording controls beside the call.
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              The newest UI adds a compact recorder window, keeps the full archive console available
+              when review work starts, and keeps the capture controls close to the call.
+            </p>
+            <div className="mt-5 grid gap-1 border border-border bg-border sm:grid-cols-2">
+              {releaseNotes.map((note) => (
+                <div key={note} className="bg-background/80 p-4 text-sm leading-6 text-muted-foreground">
+                  {note}
+                </div>
+              ))}
+            </div>
+          </MotionDiv>
+
+          <MotionDiv
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.45 }}
+          >
+            <MiniRecorderFrame />
+          </MotionDiv>
+        </div>
+      </section>
+
+      <section className="px-2 pb-12 sm:px-4">
+        <div className="mx-auto max-w-6xl">
+          <MobileScreenshotFrame />
         </div>
       </section>
 

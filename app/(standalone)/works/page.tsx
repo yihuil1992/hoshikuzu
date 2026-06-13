@@ -270,8 +270,8 @@ export default function WorksPage() {
       externalUrl: 'https://github.com/yihuil1992/note-taker',
       externalLabel: 'GitHub',
       description:
-        'Local-first meeting capture app for Windows. It records microphone and computer audio, transcribes with a local Whisper sidecar, summarizes with Codex CLI, and exports Markdown or JSON notes.',
-      tags: ['Tauri', 'Whisper', 'SQLite', 'Codex CLI'],
+        'Local-first meeting capture app for Windows with a compact mini recorder, dual-stream audio capture, local Whisper transcription, Codex summaries, and signed updater support.',
+      tags: ['Tauri', 'Mini mode', 'Whisper', 'Updater'],
       repo: null,
       code: 'WORK-05',
       imageSrc: '/assets/works/note-taker-night.png',
