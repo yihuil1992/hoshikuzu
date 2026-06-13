@@ -45,7 +45,7 @@ export const presetStars: PresetStar[] = [
   {
     name: 'Note Taker',
     url: '/note-taker',
-    description: 'A local-first Windows meeting recorder with Whisper transcription and Codex summaries.',
+    description: 'A local-first Windows meeting recorder with mini mode, Whisper, Codex summaries, and signed updates.',
     color: '#c7f4df',
     emissive: '#7bd7ad',
     position: new THREE.Vector3(2.2, 1.2, 0),
