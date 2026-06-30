@@ -5,6 +5,7 @@ import {
   Bot,
   Download,
   FileJson,
+  FolderSearch,
   Github,
   HardDrive,
   Mic,
@@ -24,13 +25,13 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 const REPO_URL = 'https://github.com/yihuil1992/note-taker';
-const RELEASES_URL = `${REPO_URL}/releases`;
+const RELEASES_URL = `${REPO_URL}/releases/latest`;
 
 const signals = [
   { label: 'Microphone', value: 'On', icon: Mic },
   { label: 'Computer audio', value: 'On', icon: MonitorSpeaker },
   { label: 'Mini mode', value: 'Ready', icon: Minimize2 },
-  { label: 'Release', value: 'v0.2.4', icon: Download },
+  { label: 'Updater', value: 'Signed', icon: Download },
 ];
 
 const capabilities = [
@@ -61,8 +62,14 @@ const capabilities = [
   {
     icon: Sparkles,
     title: 'Codex summaries',
-    desc: 'Turns transcript segments into structured summaries, topics, decisions, and action items.',
-    tags: ['Codex CLI', 'Transcript segments'],
+    desc: 'Turns transcript segments into structured meeting records with overview, topics, decisions, action items, open questions, and detail.',
+    tags: ['Codex CLI', 'Structured record'],
+  },
+  {
+    icon: FolderSearch,
+    title: 'Project-aware context',
+    desc: 'Registers local project folders as read-only context so Codex can pull relevant snippets while filtering secrets, bulky files, logs, and build output.',
+    tags: ['Read-only folders', 'Filtered context'],
   },
   {
     icon: FileJson,
@@ -79,11 +86,11 @@ const privacyNotes = [
   'OpenAI transcription is opt-in and uses the OS credential store.',
 ];
 
-const releaseNotes = [
+const workflowNotes = [
   'Mini recorder gives the capture path a compact always-on-top surface.',
   'Smart transcription windows skip silence and add short pre/post-roll.',
-  'Glossary prompting helps product names, acronyms, and Chinese terms survive transcription.',
-  'Signed updater checks GitHub Releases for v0.2.4 bundles.',
+  'Project folders can be registered as read-only context for Codex summaries.',
+  'Signed updater checks GitHub Releases for the latest available bundle.',
 ];
 
 function ScreenshotFrame({
@@ -129,7 +136,7 @@ function MobileScreenshotFrame() {
           Mobile archive
         </div>
         <span className="text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          v0.2.4
+          narrow
         </span>
       </div>
       <div className="relative aspect-[390/844] bg-background">
@@ -194,7 +201,7 @@ export default function NoteTakerPage() {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="gap-2">
                 <Link href={RELEASES_URL} target="_blank" rel="noreferrer">
-                  View releases <Download className="size-4" />
+                  View latest release <Download className="size-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" className="gap-2">
@@ -261,8 +268,8 @@ export default function NoteTakerPage() {
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               The app makes source readiness, mini-recorder access, provider state, credential
-              storage, transcript segments, summary state, release status, and export actions
-              visible without turning the meeting record into a cloud dashboard.
+              storage, transcript segments, summary state, update status, reference context, and
+              export actions visible without turning the meeting record into a cloud dashboard.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               {['Mini mode', 'Whisper sidecar', 'OpenAI optional', 'Signed updater'].map((tag) => (
@@ -292,11 +299,11 @@ export default function NoteTakerPage() {
               Mini mode keeps recording controls beside the call.
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              The newest UI adds a compact recorder window, keeps the full archive console available
-              when review work starts, and keeps the capture controls close to the call.
+              The compact recorder stays close to the call, while the full archive console keeps
+              transcripts, summaries, reference context, and export work ready for review.
             </p>
             <div className="mt-5 grid gap-1 border border-border bg-border sm:grid-cols-2">
-              {releaseNotes.map((note) => (
+              {workflowNotes.map((note) => (
                 <div key={note} className="bg-background/80 p-4 text-sm leading-6 text-muted-foreground">
                   {note}
                 </div>
