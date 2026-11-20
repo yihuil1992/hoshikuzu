@@ -12,7 +12,7 @@
     "test:security": "node --test scripts/security/osv-scan.test.mjs"
   },
   "dependencies": {
-    "@next/third-parties": "15.5.28",
+    "@next/third-parties": "15.5.29",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-select": "^2.2.6",
@@ -28,7 +28,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^10.12.16",
     "lucide-react": "^0.556.0",
-    "next": "15.5.28",
+    "next": "15.5.29",
     "nuqs": "^2.8.3",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
@@ -48,7 +48,7 @@
     "css-loader": "^7.1.2",
     "eslint": "^9.37.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-config-next": "15.5.28",
+    "eslint-config-next": "15.5.29",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
